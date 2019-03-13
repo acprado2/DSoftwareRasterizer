@@ -10,8 +10,8 @@ import std.stdio;
 import std.datetime.stopwatch;
 
 // Window dimensions (fixed for the time being)
-static immutable WIDTH = 1600;
-static immutable HEIGHT = 900;
+static immutable WIDTH = 800;
+static immutable HEIGHT = 600;
 
 int main( string[] args )
 {
@@ -26,7 +26,7 @@ int main( string[] args )
 		SDL_Event event;
 		Bitmap bmp = w.getBitMap();
 
-		StarDemo stars = new StarDemo( 8192, 20.0f, 40.0f );
+		StarDemo stars = new StarDemo( 4096, 16.0f, 40.0f );
 
 		StopWatch sw;
 		sw.start();
@@ -41,13 +41,12 @@ int main( string[] args )
 			}
 
 			// Calculate the time that has elapsed between frames
-			long curTime = sw.peek().total!"nsecs";
-			float change = cast( float )( curTime / 1000000000.0 );
+			long curTime = sw.peek().total!"msecs";
+			float change = cast( float )( curTime / 1000.0f );
+			sw.reset();
 
 			stars.update( bmp, change );
 			w.update();
-
-			sw.reset();
 		}
 
 		w.quit();

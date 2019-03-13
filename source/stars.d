@@ -23,30 +23,30 @@ public:
 	{
 		bmp.fill( cast(byte)0x00 );
 
-		float halfW = bmp.getWidth() / 2.0;
-		float halfH = bmp.getHeight() / 2.0;
+		float halfW = bmp.getWidth() / 2.0f;
+		float halfH = bmp.getHeight() / 2.0f;
 		foreach( int i; 0 .. stars.length )
 		{
-			stars[i].z += change * speed;
+ 			stars[i].z -= change * speed;
 
 			// Current star has gone too far, reinit.
-			if ( stars[i].z <= 1 )
+			if ( stars[i].z <= 0 )
 			{
 				init( i );
 			}
 
-			stars[i].x = ( ( stars[i].x / stars[i].z ) * halfW + halfW );
-			stars[i].y = ( ( stars[i].y / stars[i].z ) * halfH + halfH );
+			int x = cast( int )( ( stars[i].x / stars[i].z ) * halfW + halfW );
+			int y = cast( int )( ( stars[i].y / stars[i].z ) * halfH + halfH );
 
-			if ( stars[i].x < 0 || stars[i].x >= bmp.getWidth()
-			  || stars[i].y < 0 || stars[i].y >= bmp.getHeight() )
+			if ( x < 0 || x >= bmp.getWidth()
+			  || y < 0 || y >= bmp.getHeight() )
 			{
 				// Current star is outside of the x/y plane, reinit.
 				init( i );
 			}
 			else
 			{
-				bmp.draw( cast( int )stars[i].x, cast( int )stars[i].y, stars[i].color );
+				bmp.draw( x, y, stars[i].color );
 			}
 		}
 	}
