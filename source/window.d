@@ -26,7 +26,7 @@ public:
 		}
 
 		// Create new window at the center of the screen
-		window = SDL_CreateWindow( title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags );
+		window = SDL_CreateWindow( title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags );
 		renderer = SDL_CreateRenderer( window, -1, SDL_RendererFlags.SDL_RENDERER_SOFTWARE );
 
 		if ( !window )
@@ -35,7 +35,7 @@ public:
 			return false;
 		}
 
-		bmp = new Bitmap( height, width );
+		bmp = new Bitmap( width, height );
 
 		return true;
 	}
@@ -44,12 +44,15 @@ public:
 	void quit()
 	{
 		SDL_FreeSurface( surface );
+		SDL_DestroyTexture( tex );
+		SDL_DestroyRenderer( renderer );
 		SDL_DestroyWindow( window );
 		SDL_Quit();
 	}
 
 	void update()
 	{
+		// Free up memory from the last frame
 		SDL_DestroyTexture( tex );
 		SDL_FreeSurface( surface );
 		SDL_RenderClear( renderer );
@@ -57,6 +60,7 @@ public:
 		//draw a random pixel every update 
 		//bmp.draw( uniform(0, width), uniform(0, height), Color(cast(byte)uniform(0, 255), cast(byte)uniform(0, 255), cast(byte)uniform(0, 255), cast(byte)uniform(0, 255) ) );
 
+		// Create the next frame
 		surface = SDL_CreateRGBSurfaceFrom( cast( void* )bmp.map, width, height, 32, width * 4, rmask, gmask, bmask, amask );
 		tex = SDL_CreateTextureFromSurface( renderer, surface );
 
