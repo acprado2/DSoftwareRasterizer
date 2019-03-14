@@ -10,8 +10,8 @@ import std.stdio;
 import std.datetime.stopwatch;
 
 // Window dimensions (fixed for the time being)
-static immutable WIDTH = 800;
-static immutable HEIGHT = 600;
+static immutable WIDTH = 1200;
+static immutable HEIGHT = 800;
 
 int main( string[] args )
 {
@@ -26,7 +26,7 @@ int main( string[] args )
 		SDL_Event event;
 		Bitmap bmp = w.getBitMap();
 
-		StarDemo stars = new StarDemo( 4096, 16.0f, 40.0f );
+		StarDemo stars = new StarDemo( 4096, 16.0f, 40.0f, 110.0f );
 
 		StopWatch sw;
 		sw.start();

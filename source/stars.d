@@ -3,14 +3,16 @@ module stars;
 import bitmap;
 import point;
 import std.random;
+import std.math;
 
 class StarDemo
 {
 public:
-	this( int starCount, float speed, float spread )
+	this( int starCount, float speed, float spread, float fov )
 	{
 		this.speed = speed;
 		this.spread = spread;
+		this.fovRadians = this.toRadians( fov );
 		stars = new Point[starCount];
 
 		foreach( int i; 0 .. stars.length )
@@ -35,8 +37,8 @@ public:
 				init( i );
 			}
 
-			int x = cast( int )( ( stars[i].x / stars[i].z ) * halfW + halfW );
-			int y = cast( int )( ( stars[i].y / stars[i].z ) * halfH + halfH );
+			int x = cast( int )( ( stars[i].x / ( stars[i].z * tan( fovRadians / 2 ) ) ) * halfW + halfW );
+			int y = cast( int )( ( stars[i].y / ( stars[i].z * tan( fovRadians / 2 ) ) ) * halfH + halfH );
 
 			if ( x < 0 || x >= bmp.getWidth()
 			  || y < 0 || y >= bmp.getHeight() )
@@ -63,8 +65,14 @@ private:
 		stars[index].color = Color(cast(byte)uniform( 0, 255 ), cast( byte )uniform( 0, 255 ), cast( byte )uniform( 0, 255 ), cast( byte )uniform( 0, 255 ) );
 	}
 
+	real toRadians( float theta )
+	{
+		return cast( real )( ( theta * PI ) / 180 );
+	}
+
 private:
 	Point[] stars;
 	const float speed;
 	const float spread;
+	const real fovRadians;
 }
