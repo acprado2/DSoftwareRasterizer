@@ -1,27 +1,27 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{83421E54-E5D0-4A44-A37B-3791016E01F9}") = "dsoftwarerasterizer", ".dub/dsoftwarerasterizer.visualdproj", "{1AF75E47-5F38-42FE-B3FE-E7F72DA3CEC1}"
+Project("{33094345-844F-4DBE-9AB1-0BF2DB560E81}") = "dsoftwarerasterizer", ".dub/dsoftwarerasterizer.visualdproj", "{DCB43B1C-338D-459D-B961-E446DFF280E4}"
 	ProjectSection(ProjectDependencies) = postProject
-		{2F9ABF0E-2526-496D-A49A-CEFEE339CB7E} = {2F9ABF0E-2526-496D-A49A-CEFEE339CB7E}
-		{DCD0291B-26D6-43F4-916F-0AAC562EC7DD} = {DCD0291B-26D6-43F4-916F-0AAC562EC7DD}
-		{DCD0291B-26D6-43F4-916F-0AAC562EC7DD} = {DCD0291B-26D6-43F4-916F-0AAC562EC7DD}
+		{1F0AC4A9-2260-4CFD-A18C-985E51739875} = {1F0AC4A9-2260-4CFD-A18C-985E51739875}
+		{6C80F3E0-8794-4508-884D-7BFCF0AC4247} = {6C80F3E0-8794-4508-884D-7BFCF0AC4247}
+		{6C80F3E0-8794-4508-884D-7BFCF0AC4247} = {6C80F3E0-8794-4508-884D-7BFCF0AC4247}
 	EndProjectSection
 EndProject
-Project("{83421E54-E5D0-4A44-A37B-3791016E01F9}") = "derelict-sdl2", ".dub/derelict-sdl2.visualdproj", "{2F9ABF0E-2526-496D-A49A-CEFEE339CB7E}"
+Project("{33094345-844F-4DBE-9AB1-0BF2DB560E81}") = "derelict-sdl2", ".dub/derelict-sdl2.visualdproj", "{1F0AC4A9-2260-4CFD-A18C-985E51739875}"
 EndProject
-Project("{83421E54-E5D0-4A44-A37B-3791016E01F9}") = "derelict-util", ".dub/derelict-util.visualdproj", "{DCD0291B-26D6-43F4-916F-0AAC562EC7DD}"
+Project("{33094345-844F-4DBE-9AB1-0BF2DB560E81}") = "derelict-util", ".dub/derelict-util.visualdproj", "{6C80F3E0-8794-4508-884D-7BFCF0AC4247}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DCD0291B-26D6-43F4-916F-0AAC562EC7DD}.debug|Win32.ActiveCfg = debug|Win32
-		{DCD0291B-26D6-43F4-916F-0AAC562EC7DD}.debug|Win32.Build.0 = debug|Win32
-		{2F9ABF0E-2526-496D-A49A-CEFEE339CB7E}.debug|Win32.ActiveCfg = debug|Win32
-		{2F9ABF0E-2526-496D-A49A-CEFEE339CB7E}.debug|Win32.Build.0 = debug|Win32
-		{1AF75E47-5F38-42FE-B3FE-E7F72DA3CEC1}.debug|Win32.ActiveCfg = debug|Win32
-		{1AF75E47-5F38-42FE-B3FE-E7F72DA3CEC1}.debug|Win32.Build.0 = debug|Win32
+		{6C80F3E0-8794-4508-884D-7BFCF0AC4247}.debug|Win32.ActiveCfg = debug|Win32
+		{6C80F3E0-8794-4508-884D-7BFCF0AC4247}.debug|Win32.Build.0 = debug|Win32
+		{1F0AC4A9-2260-4CFD-A18C-985E51739875}.debug|Win32.ActiveCfg = debug|Win32
+		{1F0AC4A9-2260-4CFD-A18C-985E51739875}.debug|Win32.Build.0 = debug|Win32
+		{DCB43B1C-338D-459D-B961-E446DFF280E4}.debug|Win32.ActiveCfg = debug|Win32
+		{DCB43B1C-338D-459D-B961-E446DFF280E4}.debug|Win32.Build.0 = debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

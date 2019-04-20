@@ -50,11 +50,10 @@ public:
 
 	int getWidth() { return width; }
 	int getHeight() { return height; }
-
-public:
-	byte[] map;
+	byte[] getFrameBuffer() { return map; }
 
 private:
+	byte[] map;
 	const int width;
 	const int height;
 }

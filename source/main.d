@@ -3,8 +3,9 @@ module main;
 import vector;
 import point;
 import window;
-import bitmap;
-import stars;
+//import bitmap;
+//import stars;
+import rasterizer;
 import derelict.sdl2.sdl;
 import std.stdio;
 import std.datetime.stopwatch;
@@ -24,8 +25,9 @@ int main( string[] args )
 		// Main program loop where we check when the program should terminate. Will be relocated later.
 		bool bRunning = true;
 		SDL_Event event;
-		Bitmap bmp = w.getBitMap();
+		Rasterizer rasterizer = w.getRasterizer();
 
+		/*Bitmap bmp = rasterizer.getFrameBuffer();
 		StarDemo stars = new StarDemo( 4096, 16.0f, 40.0f, 110.0f );
 
 		StopWatch sw;
@@ -46,6 +48,20 @@ int main( string[] args )
 			sw.reset();
 
 			stars.update( bmp, change );
+			w.update();
+		}*/
+
+		rasterizer.drawTriangle( new Point( 300, 100 ), new Point( 200, 700 ), new Point( 400, 20 ) );
+
+		while ( bRunning )
+		{
+			// Poll window events
+			while ( SDL_PollEvent( &event ) != 0 )
+			{
+				if ( event.type == SDL_QUIT )
+					bRunning = false;
+			}
+
 			w.update();
 		}
 

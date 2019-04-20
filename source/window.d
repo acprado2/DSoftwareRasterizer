@@ -1,6 +1,6 @@
 module window;
 
-import bitmap;
+import rasterizer;
 import derelict.sdl2.sdl;
 import std.stdio;
 
@@ -35,7 +35,7 @@ public:
 			return false;
 		}
 
-		bmp = new Bitmap( width, height );
+		rasterizer = new Rasterizer( width, height );
 
 		return true;
 	}
@@ -57,11 +57,8 @@ public:
 		SDL_FreeSurface( surface );
 		SDL_RenderClear( renderer );
 
-		//draw a random pixel every update 
-		//bmp.draw( uniform(0, width), uniform(0, height), Color(cast(byte)uniform(0, 255), cast(byte)uniform(0, 255), cast(byte)uniform(0, 255), cast(byte)uniform(0, 255) ) );
-
 		// Create the next frame
-		surface = SDL_CreateRGBSurfaceFrom( cast( void* )bmp.map, width, height, 32, width * 4, rmask, gmask, bmask, amask );
+		surface = SDL_CreateRGBSurfaceFrom( cast( void* )rasterizer.getFrameBuffer(), width, height, 32, width * 4, rmask, gmask, bmask, amask );
 		tex = SDL_CreateTextureFromSurface( renderer, surface );
 
 		SDL_RenderCopy( renderer, tex, null, null );
@@ -70,14 +67,14 @@ public:
 		SDL_UpdateWindowSurface( window );
 	}
 
-	Bitmap getBitMap() { return bmp; }
+	Rasterizer getRasterizer() { return rasterizer; }
 
 private:
 	SDL_Texture *tex = null;
 	SDL_Renderer *renderer = null;
 	SDL_Window *window = null;
 	SDL_Surface *surface = null;
-	Bitmap bmp;
+	Rasterizer rasterizer;
 	int height = 640;
 	int width = 480;
 	const char *title = "Window";
