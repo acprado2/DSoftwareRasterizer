@@ -79,11 +79,13 @@ public:
 		if ( p1.y > p2.y ) { swap( p1, p2 ); }
 
 		// Get two vectors from our three points
-		Vector v1 = p3.subtractPointFromPoint( p1 );
-		Vector v2 = p2.subtractPointFromPoint( p1 );
+		Vec2f v1 = p3.subtractPointFromPoint2D( p1 );
+		Vec2f v2 = p2.subtractPointFromPoint2D( p1 );
 
 		// Determine if the triangle is left-hand or right-hand using the area
-		int offset = v1.crossProduct2D( v2 ) >= 0 ? 1 : 0;
+		// NOTE: cross product gives us the area of the parallelogram spanning the vectors but to save 
+		// computation cycles and because it doesn't matter for our purposes we don't divide this by 2
+		int offset = v1.crossProduct( v2 ) >= 0 ? 1 : 0;
 
 		drawLine( p1, p3, offset );
 		drawLine( p1, p2, 1 - offset );
