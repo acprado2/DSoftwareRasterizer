@@ -1,3 +1,9 @@
+//=============================================================================
+//
+// Purpose: Generic bitmap that stores color data for screen pixels
+//
+//=============================================================================
+
 module bitmap;
 
 import std.typecons;
@@ -19,7 +25,7 @@ public:
 	void fill( byte shade )
 	{
 		// Fill the rgba values of each pixel with the specified shade
-		foreach( i; 0 .. map.length )
+		foreach ( i; 0 .. map.length )
 		{
 			map[i] = shade;
 		}
@@ -29,7 +35,7 @@ public:
 	void fill( Color c )
 	{
 		// Fill each pixel with the specified color
-		for( int i = 0; i < map.length; i += 4 )
+		for ( int i = 0; i < map.length; i += 4 )
 		{
 			map[i] = c.r;
 			map[i + 1] = c.g;

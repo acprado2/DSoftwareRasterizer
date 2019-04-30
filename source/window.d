@@ -1,3 +1,9 @@
+//=============================================================================
+//
+// Purpose: Graphical window where images are presented and updated
+//
+//=============================================================================
+
 module window;
 
 import rasterizer;
