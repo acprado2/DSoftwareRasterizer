@@ -5,7 +5,9 @@ import point;
 import window;
 //import bitmap;
 //import stars;
+import vector;
 import rasterizer;
+import matrix;
 import derelict.sdl2.sdl;
 import std.stdio;
 import std.datetime.stopwatch;
@@ -27,11 +29,11 @@ int main( string[] args )
 		SDL_Event event;
 		Rasterizer rasterizer = w.getRasterizer();
 
-		/*Bitmap bmp = rasterizer.getFrameBuffer();
-		StarDemo stars = new StarDemo( 4096, 16.0f, 40.0f, 110.0f );
-
-		StopWatch sw;
+		/*StopWatch sw;
 		sw.start();
+
+		Bitmap bmp = cast( Bitmap )rasterizer;
+		StarDemo stars = new StarDemo( 4096, 16.0f, 40.0f, 110.0f );
 
 		while ( bRunning )
 		{
@@ -51,7 +53,11 @@ int main( string[] args )
 			w.update();
 		}*/
 
-		rasterizer.drawTriangle( new Point( 300, 100 ), new Point( 200, 700 ), new Point( 400, 20 ) );
+		Vec4f vec1 = new Vec4f( 0.0, 0.5, 1 );
+		Vec4f vec2 = new Vec4f( -0.3, -0.2, 1 );
+		Vec4f vec3 = new Vec4f( 0.5, 0.0, 1 );
+
+		//Matrix_4x4 projection = new Matrix_4x4().initPerspective(degreesToRadians( 110.0f ), cast(float)HEIGHT/WIDTH, 0.1f, 1000.0f);
 
 		while ( bRunning )
 		{
@@ -61,6 +67,14 @@ int main( string[] args )
 				if ( event.type == SDL_QUIT )
 					bRunning = false;
 			}
+
+			rasterizer.fill( cast(byte)0x00 );
+
+			float deg = ( SDL_GetTicks() / 1000.0f ) % 360;
+
+			Matrix_4x4 mat = identity().rotate( new Vec4f( 0.0f, 0.0f, 1.0f ), degreesToRadians( deg * 30 ) );
+			rasterizer.drawTriangle( mat.transform( vec1 ), mat.transform( vec2 ), mat.transform( vec3 ) );
+			//rasterizer.drawTriangle( vec1, vec2, vec3 );
 
 			w.update();
 		}
