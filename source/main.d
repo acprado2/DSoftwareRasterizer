@@ -57,7 +57,7 @@ int main( string[] args )
 		Vec4f vec2 = new Vec4f( -0.3, -0.2, 1 );
 		Vec4f vec3 = new Vec4f( 0.5, 0.0, 1 );
 
-		//Matrix_4x4 projection = new Matrix_4x4().initPerspective(degreesToRadians( 110.0f ), cast(float)HEIGHT/WIDTH, 0.1f, 1000.0f);
+		Matrix_4x4 projection = perspective( degreesToRadians( 110.0f ), cast( float )WIDTH/HEIGHT, 0.1f, 1000.0f );
 
 		while ( bRunning )
 		{
@@ -72,7 +72,7 @@ int main( string[] args )
 
 			float deg = ( SDL_GetTicks() / 1000.0f ) % 360;
 
-			Matrix_4x4 mat = identity().rotate( new Vec4f( 0.0f, 0.0f, 1.0f ), degreesToRadians( deg * 30 ) );
+			Matrix_4x4 mat = projection.rotate( new Vec4f( 0.0f, 0.0f, 1.0f ), degreesToRadians( deg * 60 ) );
 			rasterizer.drawTriangle( mat.transform( vec1 ), mat.transform( vec2 ), mat.transform( vec3 ) );
 			//rasterizer.drawTriangle( vec1, vec2, vec3 );
 

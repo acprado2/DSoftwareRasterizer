@@ -236,3 +236,18 @@ pragma( inline ) Matrix_4x4 identity()
 
 	return iden;
 }
+
+// Perspective matrix
+// FOV = field of view in radians
+// zNear/zFar = mappings for z from 0 to 1
+Matrix_4x4 perspective( float FOV, float aspectRatio, float zNear, float zFar )
+{
+	float invScale = tan( FOV / 2 );
+	float zRange = zNear - zFar;
+
+	float[][] m = [[1 / ( invScale * aspectRatio ), 0.0f, 0.0f, 0.0f],
+				   [0.0f, 1.0f / invScale, 0.0f, 0.0f],
+				   [0.0f, 0.0f, (-zNear -zFar) / zRange, ( 2 * zFar * zNear ) / zRange],
+				   [0.0f, 0.0f, 1.0f, 0.0f]];
+	return new Matrix_4x4( m );
+}
