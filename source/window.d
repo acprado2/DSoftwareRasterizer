@@ -9,6 +9,7 @@ module window;
 import rasterizer;
 import derelict.sdl2.sdl;
 import std.stdio;
+import std.string;
 
 class Window
 {
@@ -71,6 +72,10 @@ public:
 		SDL_RenderPresent( renderer );
 
 		SDL_UpdateWindowSurface( window );
+
+		deltaTime = SDL_GetTicks() - startTime;
+		startTime = SDL_GetTicks();
+		SDL_SetWindowTitle( window, toStringz( format( "%s%d", "FPS: ", 1000 / deltaTime ) ) );
 	}
 
 	Rasterizer getRasterizer() { return rasterizer; }
@@ -85,6 +90,10 @@ private:
 	int width = 480;
 	const char *title = "Window";
 	SDL_WindowFlags flags = SDL_WINDOW_SHOWN;
+
+	// FPS counter
+	uint startTime = 0;
+	uint deltaTime = 0;
 
 	// Check if the system uses big or little endian so rbga masks work as intended
 	version ( BigEndian )
