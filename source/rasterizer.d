@@ -8,7 +8,6 @@ module rasterizer;
 
 import bitmap;
 import vector;
-import point;
 import matrix;
 import std.math;
 import std.algorithm.mutation;
@@ -19,61 +18,98 @@ public:
 	this( int width, int height )
 	{
 		super( width, height );
-		scanBuffer = new int[2 * height];
 	}
 
-	// Load a line into the scan buffer. bufferOffset used for min/max of shape
-	void drawLine( Vec4f vec1, Vec4f vec2, int bufferOffset )
+	// draw a line given two vectors
+	void drawLine( Vec4f vec1, Vec4f vec2 )
 	{
-		int x1 = cast( int )vec1.x;
-		int x2 = cast( int )vec2.x;
-		int y1 = cast( int )vec1.y;
-		int y2 = cast( int )vec2.y;
-		int dx = x2 - x1;
-		int dy = y2 - y1;
+		int x1 = cast( int )ceil( vec1.x );
+		int x2 = cast( int )ceil( vec2.x );
+		int y1 = cast( int )ceil( vec1.y );
+		int y2 = cast( int )ceil( vec2.y );
+		int dx = abs( x2 - x1 );
+		int dy = abs( y2 - y1 );
+		bool bSwapAxes = false;
 
-		// Don't bother tracing this line if it's horizontal; our other lines will fill the triangle
-		if ( dy <= 0 )
+		// If the y-axis covers more pixels than the x-axis we need to iterate over y instead of x
+		if ( dy > dx )
 		{
-			return;
+			swap( x1, y1 );
+			swap( x2, y2 );
+			bSwapAxes = true;
 		}
 
-		// increment our x value in steps
-		float x = x1;
-		float step = cast( float )dx / cast( float )dy;
-
-
-		for ( int y = y1; y < y2; ++y )
+		// Swap p1 and p2 if x2 is farther along the plane than x1
+		if ( x1 > x2 )
 		{
-			scanBuffer[y * 2 + bufferOffset] = cast( int )x; 
-			x += step;
+			swap( x1, x2 );
+			swap( y1, y2 );
+		}
+
+		dx = x2 - x1;
+		dy = abs( y2 - y1 );
+		int derror = 2 * dy;
+		int error = 0;
+		int y = y1;
+		Color def = Color( cast (byte)0x00, cast (byte)0x00, cast (byte)0x00, cast (byte)0x00 );
+
+		for ( int x = x1; x <= x2; ++x )
+		{
+			// If we swapped axes earlier correct on draw
+			bSwapAxes ? draw( y, x, def ) : draw( x, y, def );
+
+			error += derror;
+			if ( error > dx )
+			{
+				( y2 > y1 ) ? ++y : --y;
+				error -= 2 * dx;
+			}
 		}
 	}
 
-	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3 )
+	// draw a horizontal line between two x-coordinates given a y-pos
+	void drawLineHorizontal( int x1, int x2, int ypos )
+	{
+		for ( int x = x1; x < x2; ++x )
+		{
+			draw( x, ypos, Color( cast (byte)0xFF, cast (byte)0x00, cast (byte)0x00, cast (byte)0xFF ) );
+		}
+	}
+
+	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, bool bWireframe = false )
 	{
 		// Map our triangle to screen space
 		Matrix_4x4 viewport = viewportTransform( getWidth() / 2.0f, getHeight() / 2.0f );
 
 		// Draw triangle
-		triangle( viewport.transform( vec1 ).perspectiveDivide(),
-				  viewport.transform( vec2 ).perspectiveDivide(),
-				  viewport.transform( vec3 ).perspectiveDivide() );
-	}
-
-	// Fill in a shape from our scan buffer
-	void fillShape( int yMin, int yMax )
-	{
-		for ( int i = yMin; i < yMax; ++i )
+		if ( bWireframe )
 		{
-			for ( int j = scanBuffer[i * 2]; j < scanBuffer[i * 2 + 1]; ++j )
-			{
-				draw( j, i, Color( cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF ) );
-			}
+			wireframeTriangle( viewport.transform( vec1 ).perspectiveDivide(),
+					  viewport.transform( vec2 ).perspectiveDivide(),
+					  viewport.transform( vec3 ).perspectiveDivide() );
+		}
+		else
+		{
+			triangle( viewport.transform( vec1 ).perspectiveDivide(),
+					  viewport.transform( vec2 ).perspectiveDivide(),
+					  viewport.transform( vec3 ).perspectiveDivide() );
 		}
 	}
 
 private:
+	// Helper method for drawWireframeTriangle
+	void wireframeTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3 )
+	{
+		// Sort vectors by y-pos (lowest to highest)
+		if ( vec1.y > vec2.y ) { swap( vec1, vec2 ); }
+		if ( vec2.y > vec3.y ) { swap( vec2, vec3 ); }
+		if ( vec1.y > vec2.y ) { swap( vec1, vec2 ); }
+
+		drawLine( vec1, vec3 );
+		drawLine( vec1, vec2 );
+		drawLine( vec2, vec3 );
+	}
+
 	// Helper method for drawTriangle
 	void triangle( Vec4f vec1, Vec4f vec2, Vec4f vec3 )
 	{
@@ -89,14 +125,48 @@ private:
 		// Determine if the triangle is left-hand or right-hand using the area
 		// NOTE: cross product gives us the area of the parallelogram spanning the vectors but to save 
 		// computation cycles and because it doesn't matter for our purposes we don't divide this by 2
-		int offset = v1.crossProduct( v2 ) >= 0 ? 1 : 0;
+		bool bHandedness = v1.crossProduct( v2 ) >= 0 ? true : false;
 
-		drawLine( vec1, vec3, offset );
-		drawLine( vec1, vec2, 1 - offset );
-		drawLine( vec2, vec3, 1 - offset );
-		fillShape( cast( int )vec1.y, cast( int )vec3.y );
+		// In order to draw this triangle using horizontal lines we will cut the triangle into two triangles
+		// at the horizontal line that intersects vec2 and the line between vec3 and vec1
+
+		// left and right side based on handedness
+		float[] left  = bHandedness ? interpolate( vec1.x, vec1.y, vec2.x, vec2.y ) : interpolate( vec1.x, vec1.y, vec3.x, vec3.y );
+		float[] right = bHandedness ? interpolate( vec1.x, vec1.y, vec3.x, vec3.y ) : interpolate( vec1.x, vec1.y, vec2.x, vec2.y );
+		int count = -1;
+
+		// Iterate through top triangle and draw scanlines
+		foreach( i; 0 .. cast( int )ceil( vec2.y - vec1.y ) )
+		{
+			drawLineHorizontal( cast( int )ceil( left[i] ), cast( int )ceil( right[i] ), cast( int )ceil( vec1.y + i ) );
+
+			// Track step position so we can draw the bottom triangle later
+			++count;
+		}
+
+		// switch out the left or right depending on the handedness
+		bHandedness ? ( left = interpolate( vec2.x, vec2.y, vec3.x, vec3.y ) ) : ( right = interpolate( vec2.x, vec2.y, vec3.x, vec3.y ) );
+
+		// Iterate through bottom triangle and draw scanlines
+		foreach( i; 0 .. cast( int )ceil( vec3.y - vec2.y ) )
+		{
+			drawLineHorizontal( cast( int )ceil( left[bHandedness ? i : count + i] ), cast( int )ceil( right[bHandedness ? count + i : i] ), cast( int )ceil( vec2.y + i ) );
+		}
 	}
+}
 
-	// Buffer that contains min and max x positions for shape to be filled
-	int[] scanBuffer;
+// generate a list of coordinates interpolated along a line
+float[] interpolate( float x1, float y1, float x2, float y2 )
+{
+	int dy = cast( int )ceil( y2 - y1 );
+	float[] result = new float[dy];
+	float step = ( x2 - x1 ) / result.length;
+	float x = x1;
+
+	for ( int y = 0; y < dy; ++y )
+	{
+		result[y] = x;
+		x += step;
+	}
+	return result;
 }

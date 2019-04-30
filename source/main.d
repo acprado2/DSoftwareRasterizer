@@ -1,9 +1,8 @@
 module main;
 
 import vector;
-import point;
 import window;
-//import bitmap;
+import bitmap;
 //import stars;
 import vector;
 import rasterizer;
@@ -68,12 +67,13 @@ int main( string[] args )
 					bRunning = false;
 			}
 
-			rasterizer.fill( cast(byte)0x00 );
+			rasterizer.fill( cast(byte)0xFF );
 
 			float deg = ( SDL_GetTicks() / 1000.0f ) % 360;
 
-			Matrix_4x4 mat = projection.rotate( new Vec4f( 0.0f, 0.0f, 1.0f ), degreesToRadians( deg * 60 ) );
+			Matrix_4x4 mat = projection.rotate( new Vec4f( 0.5f, 0.01f, 1.0f ), degreesToRadians( deg * 30 ) );
 			rasterizer.drawTriangle( mat.transform( vec1 ), mat.transform( vec2 ), mat.transform( vec3 ) );
+			rasterizer.drawTriangle( mat.transform( vec1 ), mat.transform( vec2 ), mat.transform( vec3 ), true );
 			//rasterizer.drawTriangle( vec1, vec2, vec3 );
 
 			w.update();
