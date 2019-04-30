@@ -52,9 +52,9 @@ int main( string[] args )
 			w.update();
 		}*/
 
-		Vec4f vec1 = new Vec4f( 0.0, 0.5, 1 );
-		Vec4f vec2 = new Vec4f( -0.3, -0.2, 1 );
-		Vec4f vec3 = new Vec4f( 0.5, 0.0, 1 );
+		Vec4f vec1 = new Vec4f( 0.0, 0.45, 1 );
+		Vec4f vec2 = new Vec4f( -0.35, -0.2, 1 );
+		Vec4f vec3 = new Vec4f( 0.25, 0.0, 1 );
 
 		Matrix_4x4 projection = perspective( degreesToRadians( 110.0f ), cast( float )WIDTH/HEIGHT, 0.1f, 1000.0f );
 
@@ -71,7 +71,12 @@ int main( string[] args )
 
 			float deg = ( SDL_GetTicks() / 1000.0f ) % 360;
 
-			Matrix_4x4 mat = projection.rotate( new Vec4f( 0.5f, 0.01f, 1.0f ), degreesToRadians( deg * 30 ) );
+			Matrix_4x4 mat = identity();
+			mat = mat.rotateZ( degreesToRadians( deg * 45) );
+			mat = mat.rotateX( degreesToRadians( deg * 45) );
+			mat = mat.rotateY( degreesToRadians( deg * 45) );
+			mat = projection * mat;
+
 			rasterizer.drawTriangle( mat.transform( vec1 ), mat.transform( vec2 ), mat.transform( vec3 ) );
 			rasterizer.drawTriangle( mat.transform( vec1 ), mat.transform( vec2 ), mat.transform( vec3 ), true );
 			//rasterizer.drawTriangle( vec1, vec2, vec3 );

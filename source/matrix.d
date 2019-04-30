@@ -83,19 +83,12 @@ public:
 		return null;
 	}
 
-	// Multiply m by a scalar
-	Matrix_4x4 multiply( float scalar )
+	// Scale
+	Matrix_4x4 scale( Vec4f vec )
 	{
-		Matrix_4x4 result = new Matrix_4x4();
-		for ( size_t i = 0; i < this.numRows(); ++i )
-		{
-			for ( size_t j = 0; j < this.numCols(); ++j )
-			{
-				result[i, j] = m[i][j] * scalar;
-			}
-		}
-
-		return result;
+		float[][] m = [[vec.x, 0.0f, 0.0f, 0.0f], [0.0f, vec.x, 0.0f, 0.0f], [0.0f, 0.0f, vec.z, 0.0f], [0.0f, 0.0f, 0.0f, 1.0f]];
+		Matrix_4x4 matrix = new Matrix_4x4( m );
+		return this * matrix;
 	}
 
 	// Rotate about the x-axis
@@ -142,6 +135,16 @@ public:
 		[( axis.x * axis.z ) * ( 1.0f - cosf ) - ( axis.y * sinf ), ( axis.y * axis.z ) * ( 1.0f - cosf ) + ( axis.x * sinf ), ( axis.z * axis.z ) * ( 1.0f - cosf ) + cosf, 0.0f],
 		[0.0f, 0.0f, 0.0f, 1.0f]];
 		Matrix_4x4 matrix = new Matrix_4x4( m );
+		return this * matrix;
+	}
+
+	Matrix_4x4 translate( Vec4f vec )
+	{
+		Matrix_4x4 matrix = identity();
+		matrix[3, 0] = vec.x;
+		matrix[3, 1] = vec.y;
+		matrix[3, 2] = vec.z;
+
 		return this * matrix;
 	}
 
