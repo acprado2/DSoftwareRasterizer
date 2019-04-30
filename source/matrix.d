@@ -43,7 +43,7 @@ public:
 		// Only 4 columns
 		assert( num < MATRIX_SIZE );
 
-		for ( int i = 0; i < numRows; ++i )
+		for ( int i = 0; i < numRows(); ++i )
 		{
 			m[i][num] = col[i];
 		}
@@ -55,9 +55,9 @@ public:
 		// Make sure this is a 4x4 array
 		assert( matrix.length == 4 && matrix[0].length == 4 );
 
-		for ( size_t i = 0; i < numRows; ++i )
+		for ( size_t i = 0; i < numRows(); ++i )
 		{
-			for ( size_t j = 0; j < numCols; ++j )
+			for ( size_t j = 0; j < numCols(); ++j )
 			{
 				m[i][j] = matrix[i][j];
 			}
@@ -67,9 +67,9 @@ public:
 	Matrix_4x4 transpose()
 	{
 		Matrix_4x4 result = new Matrix_4x4();
-		for ( size_t i = 0; i < numRows; ++i )
+		for ( size_t i = 0; i < numRows(); ++i )
 		{
-			for ( size_t j = 0; j < numCols; ++j )
+			for ( size_t j = 0; j < numCols(); ++j )
 			{
 				result[i, j] = m[j][i];
 			}
@@ -87,9 +87,9 @@ public:
 	Matrix_4x4 multiply( float scalar )
 	{
 		Matrix_4x4 result = new Matrix_4x4();
-		for ( size_t i = 0; i < this.numRows; ++i )
+		for ( size_t i = 0; i < this.numRows(); ++i )
 		{
-			for ( size_t j = 0; j < this.numCols; ++i )
+			for ( size_t j = 0; j < this.numCols(); ++j )
 			{
 				result[i, j] = m[i][j] * scalar;
 			}
@@ -175,7 +175,7 @@ public:
 				for ( size_t j = 0; j < other.numCols(); ++j )
 				{
 					result[i, j] = 0.0f;
-					for ( size_t k = 0; k < this.numCols; ++k )
+					for ( size_t k = 0; k < this.numCols(); ++k )
 					{
 						result[i, j] = result[i, j] + ( m[i][k] * other[k, j] );
 					}
