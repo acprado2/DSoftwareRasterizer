@@ -7,7 +7,7 @@
 module stars;
 
 import bitmap;
-import point;
+import vector;
 import std.random;
 import std.math;
 
@@ -19,7 +19,7 @@ public:
 		this.speed = speed;
 		this.spread = spread;
 		this.fovRadians = this.toRadians( fov );
-		stars = new Point[starCount];
+		stars = new Vec3f[starCount];
 
 		foreach( int i; 0 .. stars.length )
 		{
@@ -54,7 +54,7 @@ public:
 			}
 			else
 			{
-				bmp.draw( x, y, stars[i].color );
+				bmp.draw( x, y,  Color(cast(byte)0xFF, cast( byte )0xFF, cast( byte )0xFF, cast( byte )0xFF ) );
 			}
 		}
 	}
@@ -62,13 +62,11 @@ public:
 private:
 	void init( int index )
 	{
-		stars[index] = new Point();
+		stars[index] = new Vec3f( 0.0f, 0.0f, 0.0f );
 
 		stars[index].x = ( uniform( 0.0f, 2.0f ) - 1 ) * spread; // range of -1 to 1 on x-plane
 		stars[index].y = ( uniform( 0.0f, 2.0f ) - 1 ) * spread; // range of -1 to 1 on y-plane
 		stars[index].z = ( uniform( 0.0f, 1.0f ) + 0.0001 ) * spread; // range of 0 to 1 on z-plane
-
-		stars[index].color = Color(cast(byte)uniform( 0, 255 ), cast( byte )uniform( 0, 255 ), cast( byte )uniform( 0, 255 ), cast( byte )uniform( 0, 255 ) );
 	}
 
 	real toRadians( float theta )
@@ -77,7 +75,7 @@ private:
 	}
 
 private:
-	Point[] stars;
+	Vec3f[] stars;
 	const float speed;
 	const float spread;
 	const real fovRadians;
