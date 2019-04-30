@@ -1,3 +1,9 @@
+//=============================================================================
+//
+// Purpose: Vector classes for graphical representation
+//
+//=============================================================================
+
 module vector;
 
 import std.math;
@@ -102,7 +108,7 @@ public:
 	float x, y, z, w;
 
 	// Constructors and destructors
-	this( float x, float y, float z, float w ) 
+	this( float x, float y, float z, float w = 1.0f ) 
 	{
 		this.x = x;
 		this.y = y;
@@ -125,6 +131,8 @@ public:
 		z = this.x * vec.y - this.y * vec.x;
 		return new Vector4D( x, y, z, 0 );
 	}
+
+	Vector4D perspectiveDivide() { return new Vector4D( x / w, y / w, z / w, w ); }
 
 	float Length() { return sqrt( x * x + y * y + z * z + w * w ); }
 	float LengthSqr() { return ( x * x + y * y + z * z + w * w ); } // Use this if we don't care about the exact value of the magnitude (faster)
