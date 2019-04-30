@@ -29,51 +29,24 @@ public:
 		int x2 = cast( int )vec2.x;
 		int y1 = cast( int )vec1.y;
 		int y2 = cast( int )vec2.y;
-		int dx = abs( x2 - x1 );
-		int dy = abs( y2 - y1 );
-		bool bSwapAxes = false;
+		int dx = x2 - x1;
+		int dy = y2 - y1;
 
-		// If the y-axis covers more pixels than the x-axis we need to iterate over y instead of x
-		if ( dy > dx )
+		// Don't bother tracing this line if it's horizontal; our other lines will fill the triangle
+		if ( dy <= 0 )
 		{
-			swap( x1, y1 );
-			swap( x2, y2 );
-			bSwapAxes = true;
+			return;
 		}
 
-		// Swap p1 and p2 if x2 is farther along the plane than x1
-		if ( x1 > x2 )
-		{
-			swap( x1, x2 );
-			swap( y1, y2 );
-		}
-		
-		dx = x2 - x1;
-		dy = abs( y2 - y1 );
-		int derror = 2 * dy;
-		int error = 0;
-		int y = y1;
+		// increment our x value in steps
+		float x = x1;
+		float step = cast( float )dx / cast( float )dy;
 
-		for ( int x = x1; x < x2; ++x )
-		{
-			// Set color to the color of p1 for now
-			// If we swapped axes earlier correct on draw
-			//bSwapAxes ? draw( y, x, p1.color ) : draw( x, y, p1.color );
-			if ( bSwapAxes ) 
-			{
-				scanBuffer[x * 2 + bufferOffset] = y; 
-			}
-			else
-			{ 
-				scanBuffer[y * 2 + bufferOffset] = x; 
-			}
 
-			error += derror;
-			if ( error > dx )
-			{
-				( y2 > y1 ) ? ++y : --y;
-				error -= 2 * dx;
-			}
+		for ( int y = y1; y < y2; ++y )
+		{
+			scanBuffer[y * 2 + bufferOffset] = cast( int )x; 
+			x += step;
 		}
 	}
 
