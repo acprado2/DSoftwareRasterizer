@@ -15,7 +15,7 @@ import std.stdio;
 enum WIDTH = 1200;
 enum HEIGHT = 800;
 enum DEPTH = 255;
-enum FOV = 110.0f;
+enum FOV = 70.0f;
 enum SENSITIVITY = 0.25f;
 enum MOVEMENT_SPEED = 2.0f;
 
@@ -47,7 +47,7 @@ int main( string[] args )
 		float pitch = 0.0f;
 		float yaw = 0.0f;
 
-		Mesh mesh = new Mesh( "2fort.obj" );
+		Mesh mesh = new Mesh( "teapot.obj" );
 
 		// Camera
 		Vec4f eye = new Vec4f( 0.0f, 0.0f, 0.0f );
@@ -116,10 +116,10 @@ int main( string[] args )
 			Matrix_4x4 view = lookAt( eye, target, up );
 
 			// Model matrix
-			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, -25.0f, -200.0f ) );
+			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, -1.0f, -10.0f ) );
 			//Matrix_4x4 r = initRotate( 0.0f, 0.0f, 0.0f );
 			Matrix_4x4 r = identity();
-			Matrix_4x4 s = initScale( new Vec4f( 1.0f, degreesToRadians( 90.0f ), 1.0f ) );
+			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f ) );
 			Matrix_4x4 model = t * r * s;
 
 			w.lockSurface();
@@ -134,7 +134,7 @@ int main( string[] args )
 				Vec4f normal = ( vec3 - vec1 ).crossProduct( vec2 - vec1 );
 				normal.normalizeInPlace();
 
-				if ( normal.dotProduct( model.transform( tri.vertices[0] ) - eye ) < 0.0f )
+				if ( normal.dotProduct( model.transform( tri.vertices[0] ) - look ) < 0.0f )
 				{
 					Vec4f light_dir = new Vec4f( 0.0f, 0.0f, 1.0f );
 					float intensity = normal.dotProduct( light_dir );
