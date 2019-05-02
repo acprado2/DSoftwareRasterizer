@@ -13,6 +13,8 @@ import std.math;
 import std.algorithm.mutation;
 import std.random;
 
+enum COLOR_WHITE = Color( cast( byte )0xFF, cast( byte )0xFF, cast( byte )0xFF, cast( byte )0xFF );
+
 class Rasterizer: Bitmap
 {
 public:
@@ -26,7 +28,7 @@ public:
 	}
 
 	// draw a line given two vectors
-	void drawLine( Vec4f vec1, Vec4f vec2 )
+	void drawLine( Vec4f vec1, Vec4f vec2, Color c  )
 	{
 		int x1 = cast( int )ceil( vec1.x );
 		int x2 = cast( int )ceil( vec2.x );
@@ -60,7 +62,6 @@ public:
 		int derror = 2 * dy;
 		int error = 0;
 		int y = y1;
-		Color def = Color( cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF );
 
 		// icky floating point math
 		float step = ( ( 1.0f / z1 ) - ( 1.0f / z2 ) ) / dy;
@@ -77,7 +78,7 @@ public:
 				z_buffer[idx] = z;
 
 				// If we swapped axes earlier correct on draw
-				bSwapAxes ? draw( y, x, def ) : draw( x, y, def );
+				bSwapAxes ? draw( y, x, c ) : draw( x, y, c );
 			}
 
 			z += step;
@@ -91,7 +92,7 @@ public:
 	}
 
 	// draw a horizontal line between two x-coordinates given a y-pos
-	void drawLineHorizontal( int x1, int x2, int ypos, float z1, float z2 )
+	void drawLineHorizontal( int x1, int x2, int ypos, float z1, float z2, Color c )
 	{
 		float zStep = ( z2 - z1 ) / ( x2 - x1 );
 		float z = z1;
@@ -102,13 +103,13 @@ public:
 			if ( z > z_buffer[idx] )
 			{
 				z_buffer[idx] = z;
-				draw( x, ypos, Color( cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF ) );
+				draw( x, ypos, c );
 			}
 			z += zStep;
 		}
 	}
 
-	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, bool bWireframe = false )
+	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, bool bWireframe = false, Color c = COLOR_WHITE )
 	{
 		// Map our triangle to screen space
 		Matrix_4x4 viewport = viewportTransform( getWidth() / 2.0f, getHeight() / 2.0f );
@@ -124,13 +125,13 @@ public:
 			{
 				wireframeTriangle( viewport.transform( vec1 ).perspectiveDivide(),
 								   viewport.transform( vec2 ).perspectiveDivide(),
-								   viewport.transform( vec3 ).perspectiveDivide() );
+								   viewport.transform( vec3 ).perspectiveDivide(), c );
 			}
 			else
 			{
 				triangle( viewport.transform( vec1 ).perspectiveDivide(),
 						  viewport.transform( vec2 ).perspectiveDivide(),
-						  viewport.transform( vec3 ).perspectiveDivide() );
+						  viewport.transform( vec3 ).perspectiveDivide(), c );
 			}
 		}
 	}
@@ -142,20 +143,20 @@ public:
 
 private:
 	// Helper method for drawWireframeTriangle
-	void wireframeTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3 )
+	void wireframeTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, Color c )
 	{
 		// Sort vectors by y-pos (lowest to highest)
 		if ( vec1.y > vec2.y ) { swap( vec1, vec2 ); }
 		if ( vec2.y > vec3.y ) { swap( vec2, vec3 ); }
 		if ( vec1.y > vec2.y ) { swap( vec1, vec2 ); }
 
-		drawLine( vec1, vec3 );
-		drawLine( vec1, vec2 );
-		drawLine( vec2, vec3 );
+		drawLine( vec1, vec3, c );
+		drawLine( vec1, vec2, c );
+		drawLine( vec2, vec3, c );
 	}
 
 	// Helper method for drawTriangle
-	void triangle( Vec4f vec1, Vec4f vec2, Vec4f vec3 )
+	void triangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, Color c )
 	{
 		// Dumb check for dumb triangles
 		if ( ( vec1.x == vec2.x && vec1.y == vec2.y ) ||
@@ -205,7 +206,7 @@ private:
 		// Iterate through top triangle and draw scanlines
 		for( int i = 0; i < cast( int )ceil( vec2.y - vec1.y ); ++i )
 		{
-			drawLineHorizontal( cast( int )ceil( left[i] ), cast( int )ceil( right[i] ), cast( int )ceil( vec1.y + i ), z_left[i], z_right[i] );
+			drawLineHorizontal( cast( int )ceil( left[i] ), cast( int )ceil( right[i] ), cast( int )ceil( vec1.y + i ), z_left[i], z_right[i], c );
 
 			// Track step position so we can draw the bottom triangle later
 			++count;
@@ -229,7 +230,7 @@ private:
 		// Iterate through bottom triangle and draw scanlines
 		for( int i = 0; i < cast( int )ceil( vec3.y - vec2.y ); ++i )
 		{
-			drawLineHorizontal( cast( int )ceil( left[bHandedness ? i : count + i] ), cast( int )ceil( right[bHandedness ? count + i : i] ), cast( int )ceil( vec2.y + i ), z_left[i], z_right[i] );
+			drawLineHorizontal( cast( int )ceil( left[bHandedness ? i : count + i] ), cast( int )ceil( right[bHandedness ? count + i : i] ), cast( int )ceil( vec2.y + i ), z_left[i], z_right[i], c );
 		}
 	}
 

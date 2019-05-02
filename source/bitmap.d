@@ -10,7 +10,7 @@ import std.typecons;
 import derelict.sdl2.sdl;
 
 // tuple that stores base rgb values and the alpha of a pixel from 0-255
-alias Color = Tuple!( byte, "r", byte, "g", byte, "b",  byte, "a" );
+alias Color = Tuple!( ubyte, "r", ubyte, "g", ubyte, "b",  ubyte, "a" );
 
 class Bitmap
 {
