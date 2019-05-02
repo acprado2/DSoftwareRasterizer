@@ -222,12 +222,14 @@ pragma( inline ) Matrix_4x4 lookAt( Vec4f eye, Vec4f center, Vec4f up )
 	Vec4f l_up = l_right.crossProduct( l_forward );
 
 	// Matrix magic
-	float[][] m = [[l_right.x, l_right.y, l_right.z, -eye.x],
-				   [l_up.x, l_up.y, l_up.z, -eye.y],
-				   [-l_forward.x, -l_forward.y, -l_forward.z, -eye.z],
+	float[][] m = [[l_right.x, l_right.y, l_right.z, 0],
+				   [l_up.x, l_up.y, l_up.z, 0],
+				   [-l_forward.x, -l_forward.y, -l_forward.z, 0],
 				   [0.0f, 0.0f, 0.0f, 1.0f]];
 
-	return new Matrix_4x4( m );
+	// We need to apply the translation before we rotate so we don't just rotate around the origin forever
+	Matrix_4x4 matrix = new Matrix_4x4( m );
+	return matrix * initTranslation( new Vec4f( -eye.x, -eye.y, -eye.z ) );
 }
 
 // Rotate about the x-axis
@@ -317,8 +319,8 @@ pragma( inline ) Matrix_4x4 initTranslation( Vec4f vec )
 // Matrix of our screen space
 Matrix_4x4 viewportTransform( float halfWidth, float halfHeight )
 {
-	float[][] m = [[halfWidth, 0.0f, 0.0f, halfWidth], 
-				   [0.0f, -halfHeight, 0.0f, halfHeight], 
+	float[][] m = [[halfWidth, 0.0f, 0.0f, halfWidth - 0.5f], 
+				   [0.0f, -halfHeight, 0.0f, halfHeight - 0.5f], 
 				   [0.0f, 0.0f, 1.0f, 0.0f], 
 				   [0.0f, 0.0f, 0.0f, 1.0f]];
 
@@ -335,7 +337,7 @@ Matrix_4x4 perspective( float FOV, float aspectRatio, float zNear, float zFar )
 
 	float[][] m = [[1 / ( invScale * aspectRatio ), 0.0f, 0.0f, 0.0f],
 				   [0.0f, 1.0f / invScale, 0.0f, 0.0f],
-				   [0.0f, 0.0f, (-zNear -zFar) / zRange, ( 2 * zFar * zNear ) / zRange],
+				   [0.0f, 0.0f, ( -zNear - zFar ) / zRange, ( 2 * zFar * zNear ) / zRange],
 				   [0.0f, 0.0f, 1.0f, 0.0f]];
 
 	return new Matrix_4x4( m );

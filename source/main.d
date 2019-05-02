@@ -14,6 +14,7 @@ import std.stdio;
 enum WIDTH = 1200;
 enum HEIGHT = 800;
 enum DEPTH = 255;
+enum FOV = 110.0f;
 enum SENSITIVITY = 0.25f;
 enum MOVEMENT_SPEED = 2.0f;
 
@@ -43,51 +44,49 @@ int main( string[] args )
 
 		// C U B E
 		triangle[12] list;
-		list[0].vertices[0] = new Vec4f( -0.2f, -0.2f, 1.0f);
-		list[0].vertices[1] = new Vec4f( -0.2f, 0.4f, 1.0f);
-		list[0].vertices[2] = new Vec4f( 0.4f, 0.4f, 1.0f);
-		list[1].vertices[0] = new Vec4f( -0.2f, -0.2f, 1.0f);
-		list[1].vertices[1] = new Vec4f( 0.4f, 0.4f, 1.0f);
-		list[1].vertices[2] = new Vec4f( 0.4f, -0.2f, 1.0f);
-		list[2].vertices[0] = new Vec4f( 0.4f, -0.2f, 1.0f);
-		list[2].vertices[1] = new Vec4f( 0.4f, 0.4f, 1.0f);
-		list[2].vertices[2] = new Vec4f( 0.4f, 0.4f, 1.4f);
-		list[3].vertices[0] = new Vec4f( 0.4f, -0.2f, 1.0f);
-		list[3].vertices[1] = new Vec4f( 0.4f, 0.4f, 1.4f);
-		list[3].vertices[2] = new Vec4f( 0.4f, -0.2f, 1.4f);
-		list[4].vertices[0] = new Vec4f( 0.4f, -0.2f, 1.4f);
-		list[4].vertices[1] = new Vec4f( 0.4f, 0.4f, 1.4f);
-		list[4].vertices[2] = new Vec4f( -0.2f, 0.4f, 1.4f);
-		list[5].vertices[0] = new Vec4f( 0.4f, -0.2f, 1.4f);
-		list[5].vertices[1] = new Vec4f( -0.2f, 0.4f, 1.4f);
-		list[5].vertices[2] = new Vec4f( -0.2f, -0.2f, 1.4f);
-		list[6].vertices[0] = new Vec4f( -0.2f, -0.2f, 1.4f);
-		list[6].vertices[1] = new Vec4f( -0.2f, 0.4f, 1.4f);
-		list[6].vertices[2] = new Vec4f( -0.2f, 0.4f, 1.0f);
-		list[7].vertices[0] = new Vec4f( -0.2f, -0.2f, 1.4f);
-		list[7].vertices[1] = new Vec4f( -0.2f, 0.4f, 1.0f);
-		list[7].vertices[2] = new Vec4f( -0.2f, -0.2f, 1.0f);
-		list[8].vertices[0] = new Vec4f( -0.2f, 0.4f, 1.0f);
-		list[8].vertices[1] = new Vec4f( -0.2f, 0.4f, 1.4f);
-		list[8].vertices[2] = new Vec4f( 0.4f, 0.4f, 1.4f);
-		list[9].vertices[0] = new Vec4f( -0.2f, 0.4f, 1.0f);
-		list[9].vertices[1] = new Vec4f( 0.4f, 0.4f, 1.4f);
-		list[9].vertices[2] = new Vec4f( 0.4f, 0.4f, 1.0f);
-		list[10].vertices[0] = new Vec4f( 0.4f, -0.2f, 1.4f);
-		list[10].vertices[1] = new Vec4f( -0.2f, -0.2f, 1.4f);
-		list[10].vertices[2] = new Vec4f( -0.2f, -0.2f, 1.0f);
-		list[11].vertices[0] = new Vec4f( 0.4f, -0.2f, 1.4f);
-		list[11].vertices[1] = new Vec4f( -0.2f, -0.2f, 1.0f);
-		list[11].vertices[2] = new Vec4f( 0.4f, -0.2f, 1.0f);
+		list[0].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.5f );
+		list[0].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.5f );
+		list[0].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.5f );
+		list[1].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.5f );
+		list[1].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.5f );
+		list[1].vertices[2] = new Vec4f( 0.4f, -0.2f, 0.5f );
+		list[2].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.5f );
+		list[2].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.5f );
+		list[2].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.9f );
+		list[3].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.5f );
+		list[3].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.9f );
+		list[3].vertices[2] = new Vec4f( 0.4f, -0.2f, 0.9f );
+		list[4].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
+		list[4].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.9f );
+		list[4].vertices[2] = new Vec4f( -0.2f, 0.4f, 0.9f );
+		list[5].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
+		list[5].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.9f );
+		list[5].vertices[2] = new Vec4f( -0.2f, -0.2f, 0.9f );
+		list[6].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.9f );
+		list[6].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.9f );
+		list[6].vertices[2] = new Vec4f( -0.2f, 0.4f, 0.5f );
+		list[7].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.9f );
+		list[7].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.5f );
+		list[7].vertices[2] = new Vec4f( -0.2f, -0.2f, 0.5f );
+		list[8].vertices[0] = new Vec4f( -0.2f, 0.4f, 0.5f );
+		list[8].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.9f );
+		list[8].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.9f );
+		list[9].vertices[0] = new Vec4f( -0.2f, 0.4f, 0.5f );
+		list[9].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.9f );
+		list[9].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.5f );
+		list[10].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
+		list[10].vertices[1] = new Vec4f( -0.2f, -0.2f, 0.9f );
+		list[10].vertices[2] = new Vec4f( -0.2f, -0.2f, 0.5f );
+		list[11].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
+		list[11].vertices[1] = new Vec4f( -0.2f, -0.2f, 0.5f );
+		list[11].vertices[2] = new Vec4f( 0.4f, -0.2f, 0.5f );
 
 		// Camera
 		Vec4f eye = new Vec4f( 0.0f, 0.0f, 0.0f );
 		Vec4f up = new Vec4f( 0.0f, 1.0f, 0.0f );
+		Vec4f look = new Vec4f( 0.0f, 0.0f, 0.0f );
 
-		Matrix_4x4 projection = perspective( degreesToRadians( 70.0f ), cast( float )WIDTH / HEIGHT, 0.1f, DEPTH );
-
-		// Map our triangle to screen space
-		Matrix_4x4 viewport = viewportTransform( WIDTH / 2.0f, HEIGHT / 2.0f );
+		Matrix_4x4 projection = perspective( degreesToRadians( FOV ), cast( float )WIDTH / HEIGHT, 0.1f, DEPTH );
 
 		while ( bRunning )
 		{
@@ -125,17 +124,19 @@ int main( string[] args )
 			// Handle keyboard events
 			// FPS controls
 			float speed = MOVEMENT_SPEED * deltaTime;
+			Vec4f fwd = look * speed;
+			Vec4f right = fwd.crossProduct( up ).normalized() * speed;
 
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_a ) ) ) { eye.x += speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_d ) ) ) { eye.x -= speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_w ) ) ) { eye.z -= speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_s ) ) ) { eye.z += speed; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_a ) ) ) { eye = eye + right; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_d ) ) ) { eye = eye - right; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_w ) ) ) { eye = eye + fwd; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_s ) ) ) { eye = eye - fwd; }
 
 			// up, down, left, right camera translations
 			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_UP ) ) )    { eye.y -= speed; }
 			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_DOWN ) ) )  { eye.y += speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_LEFT ) ) )  { eye.x += speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_RIGHT ) ) ) { eye.x -= speed; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_LEFT ) ) )  { eye.x -= speed; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_RIGHT ) ) ) { eye.x += speed; }
 
 			// Close the program on escape
 			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_ESCAPE ) ) ) { bRunning = false; }
@@ -144,11 +145,13 @@ int main( string[] args )
 			Matrix_4x4 mCameraRotation = initRotateY( degreesToRadians( yaw ) ) * initRotateX( degreesToRadians( pitch ) );
 
 			Vec4f target = new Vec4f( 0.0f, 0.0f, 1.0f, 0.0f );
-			target = eye + mCameraRotation.transform( target );// + mCameraRotation.transform( target );
+			look = mCameraRotation.transform( target );
+			target = eye + look;
+
 			Matrix_4x4 view = lookAt( eye, target, up );
 
 			// Model matrix
-			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, 3.0f ) );
+			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, 0.5f ) );
 			Matrix_4x4 t2 = initTranslation( new Vec4f( 1.0, 0.0f, 2.0f ) );
 			//Matrix_4x4 r = initRotate( degreesToRadians( deg * 30 ), degreesToRadians( deg * 30 ), degreesToRadians( deg * 30 ) );
 			Matrix_4x4 r = identity();
@@ -159,43 +162,15 @@ int main( string[] args )
 
 			foreach ( i; 0 .. list.length )
 			{
-				Vec4f vec1 = list[i].vertices[0];
-				Vec4f vec2 = list[i].vertices[1];
-				Vec4f vec3 = list[i].vertices[2];
+				Vec4f vec1 = ( projection * ( view * model ) ).transform( list[i].vertices[0] );
+				Vec4f vec2 = ( projection * ( view * model ) ).transform( list[i].vertices[1] );
+				Vec4f vec3 = ( projection * ( view * model ) ).transform( list[i].vertices[2] );
 
-				rasterizer.drawTriangle( ( viewport * ( projection * ( view * model ) ) ).transform( vec1 ),
-										 ( viewport * ( projection * ( view * model ) ) ).transform( vec2 ),
-										 ( viewport * ( projection * ( view * model ) ) ).transform( vec3 ), true );
+				rasterizer.drawTriangle( vec1, vec2, vec3, true );
 
-				rasterizer.drawTriangle( ( viewport * ( projection * ( view * model2 ) ) ).transform( vec1 ),
+				/*rasterizer.drawTriangle( ( viewport * ( projection * ( view * model2 ) ) ).transform( vec1 ),
 										 ( viewport * ( projection * ( view * model2 ) ) ).transform( vec2 ),
-										 ( viewport * ( projection * ( view * model2) ) ).transform( vec3 ), true );
-
-				/*if ( i == 2 )
-				{
-					rasterizer.drawTriangle( ( viewport * ( projection * ( view * model ) ) ).transform( vec1 ),
-											 ( viewport * ( projection * ( view * model ) ) ).transform( vec2 ),
-											 ( viewport * ( projection * ( view * model ) ) ).transform( vec3 ) );
-				}*/
-
-				/*vec1 = model.transform( vec1 );
-				vec1 = view.transform( vec1 );
-				vec1 = projection.transform( vec1 );
-				vec1 = viewport.transform( vec1 );
-
-				vec2 = model.transform( vec2 );
-				vec2 = view.transform( vec2 );
-				vec2 = projection.transform( vec2 );
-				vec2 = viewport.transform( vec2 );
-
-				vec3 = model.transform( vec3 );
-				vec3 = view.transform( vec3 );
-				vec3 = projection.transform( vec3 );
-				vec3 = viewport.transform( vec3 );
-
-				rasterizer.drawTriangle( vec1,
-										 vec2,
-										 vec3, true );*/
+										 ( viewport * ( projection * ( view * model2) ) ).transform( vec3 ), true );*/
 			}
 			w.update();
 		}

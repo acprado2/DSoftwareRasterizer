@@ -78,18 +78,29 @@ public:
 
 	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, bool bWireframe = false )
 	{
+		// Map our triangle to screen space
+		Matrix_4x4 viewport = viewportTransform( getWidth() / 2.0f, getHeight() / 2.0f );
+
+		// NOTE: positive w = not actually on screen (weird screen wrapping thing)
+		// CULLING
+		//float nearH = 2 * tan( FOV / 2 ) * 0.1, farH = 2 * tan( FOV / 2 ) * DEPTH;
+		//float nearW = nearH * ( cast( float )WIDTH / HEIGHT ), farW = farH * ( cast( float )WIDTH / HEIGHT );
+
 		// Draw triangle
-		if ( bWireframe )
+		//if ( isWithinFrustum( vec1) && isWithinFrustum( vec2 ) && isWithinFrustum( vec3 ) )
 		{
-			wireframeTriangle( vec1.perspectiveDivide(),
-							   vec2.perspectiveDivide(),
-							   vec3.perspectiveDivide() );
-		}
-		else
-		{
-			triangle( vec1.perspectiveDivide(),
-					  vec2.perspectiveDivide(),
-					  vec3.perspectiveDivide() );
+			if ( bWireframe )
+			{
+				wireframeTriangle( viewport.transform( vec1 ).perspectiveDivide(),
+								   viewport.transform( vec2 ).perspectiveDivide(),
+								   viewport.transform( vec3 ).perspectiveDivide() );
+			}
+			else
+			{
+				triangle( viewport.transform( vec1 ).perspectiveDivide(),
+						  viewport.transform( vec2 ).perspectiveDivide(),
+						  viewport.transform( vec3 ).perspectiveDivide() );
+			}
 		}
 	}
 
@@ -158,6 +169,17 @@ private:
 		{
 			drawLineHorizontal( cast( int )ceil( left[bHandedness ? i : count + i] ), cast( int )ceil( right[bHandedness ? count + i : i] ), cast( int )ceil( vec2.y + i ) );
 		}
+	}
+
+	// Culling
+	bool isWithinFrustum( Vec4f vec )
+	{
+		if ( vec.x <= vec.w && vec.y <= vec.w && vec.z <= vec.w )
+		{
+			return true;
+		}
+
+		return false;
 	}
 }
 
