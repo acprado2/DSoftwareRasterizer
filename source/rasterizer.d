@@ -81,7 +81,6 @@ public:
 		// Map our triangle to screen space
 		Matrix_4x4 viewport = viewportTransform( getWidth() / 2.0f, getHeight() / 2.0f );
 
-		// NOTE: positive w = not actually on screen (weird screen wrapping thing)
 		// CULLING
 		//float nearH = 2 * tan( FOV / 2 ) * 0.1, farH = 2 * tan( FOV / 2 ) * DEPTH;
 		//float nearW = nearH * ( cast( float )WIDTH / HEIGHT ), farW = farH * ( cast( float )WIDTH / HEIGHT );

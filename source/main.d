@@ -7,6 +7,7 @@ import vector;
 import rasterizer;
 import matrix;
 import input;
+import mesh;
 import derelict.sdl2.sdl;
 import std.stdio;
 
@@ -81,6 +82,8 @@ int main( string[] args )
 		list[11].vertices[1] = new Vec4f( -0.2f, -0.2f, -0.5f );
 		list[11].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.5f );
 
+		Mesh teapot = new Mesh( "teapot.obj" );
+
 		// Camera
 		Vec4f eye = new Vec4f( 0.0f, 0.0f, 0.0f );
 		Vec4f up = new Vec4f( 0.0f, 1.0f, 0.0f );
@@ -151,20 +154,17 @@ int main( string[] args )
 			Matrix_4x4 view = lookAt( eye, target, up );
 
 			// Model matrix
-			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, -3.0f ) );
-			Matrix_4x4 t2 = initTranslation( new Vec4f( 1.0, 0.0f, -2.0f ) );
-			//Matrix_4x4 r = initRotate( degreesToRadians( deg * 30 ), degreesToRadians( deg * 30 ), degreesToRadians( deg * 30 ) );
+			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, -5.0f ) );
+			//Matrix_4x4 r = initRotate( degreesToRadians( 0.0f ), degreesToRadians( 0.0f ), degreesToRadians( 0.0f ) );
 			Matrix_4x4 r = identity();
 			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f ) );
 			Matrix_4x4 model = t * r * s;
 
-			Matrix_4x4 model2 = t2 * r * s;
-
-			foreach ( i; 0 .. list.length )
+			foreach ( i; 0 .. teapot.triangles.length )
 			{
-				Vec4f vec1 = ( projection * ( view * model ) ).transform( list[i].vertices[0] );
-				Vec4f vec2 = ( projection * ( view * model ) ).transform( list[i].vertices[1] );
-				Vec4f vec3 = ( projection * ( view * model ) ).transform( list[i].vertices[2] );
+				Vec4f vec1 = ( projection * ( view * model ) ).transform( teapot.triangles[i].vertices[0] );
+				Vec4f vec2 = ( projection * ( view * model ) ).transform( teapot.triangles[i].vertices[1] );
+				Vec4f vec3 = ( projection * ( view * model ) ).transform( teapot.triangles[i].vertices[2] );
 
 				rasterizer.drawTriangle( vec1, vec2, vec3, true );
 
@@ -178,9 +178,4 @@ int main( string[] args )
 		w.quit();
 	}
 	return 0;
-}
-
-struct triangle
-{
-	Vec4f[3] vertices;
 }
