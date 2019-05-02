@@ -29,7 +29,7 @@ public:
 
 	void update( Bitmap bmp, float change )
 	{
-		bmp.fill( cast(byte)0x00 );
+		//bmp.fill( cast(byte)0x00 );
 
 		float halfW = bmp.getWidth() / 2.0f;
 		float halfH = bmp.getHeight() / 2.0f;

@@ -10,6 +10,7 @@ import input;
 import mesh;
 import derelict.sdl2.sdl;
 import std.stdio;
+import std.parallelism : parallel;
 
 // NOTE: Z-axis is reversed so the depth is really 0-(-255)
 enum WIDTH = 1200;
@@ -34,6 +35,10 @@ int main( string[] args )
 		bool bRunning = true;
 		SDL_Event event;
 		Rasterizer rasterizer = w.getRasterizer();
+
+		// Pass surface to rasterizer for pixel drawing
+		rasterizer.setSurface( w.getSurface() );
+
 		
 		// Track keyboard events
 		InputHandler handler = new InputHandler();
@@ -82,7 +87,7 @@ int main( string[] args )
 		list[11].vertices[1] = new Vec4f( -0.2f, -0.2f, -0.5f );
 		list[11].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.5f );
 
-		Mesh teapot = new Mesh( "teapot.obj" );
+		Mesh mesh = new Mesh( "2fort.obj" );
 
 		// Camera
 		Vec4f eye = new Vec4f( 0.0f, 0.0f, 0.0f );
@@ -93,9 +98,6 @@ int main( string[] args )
 
 		while ( bRunning )
 		{
-			// Flush the screen
-			rasterizer.fill( cast(byte)0x00 );
-
 			float flTime = SDL_GetTicks() / 1000.0f;
 			float deg = ( flTime ) % 360;
 			deltaTime = flTime - prevTime;
@@ -160,11 +162,13 @@ int main( string[] args )
 			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f ) );
 			Matrix_4x4 model = t * r * s;
 
-			foreach ( i; 0 .. teapot.triangles.length )
+			w.lockSurface();
+
+			foreach ( tri; mesh.triangles )
 			{
-				Vec4f vec1 = ( projection * ( view * model ) ).transform( teapot.triangles[i].vertices[0] );
-				Vec4f vec2 = ( projection * ( view * model ) ).transform( teapot.triangles[i].vertices[1] );
-				Vec4f vec3 = ( projection * ( view * model ) ).transform( teapot.triangles[i].vertices[2] );
+				Vec4f vec1 = ( projection * ( view * model ) ).transform( tri.vertices[0] );
+				Vec4f vec2 = ( projection * ( view * model ) ).transform( tri.vertices[1] );
+				Vec4f vec3 = ( projection * ( view * model ) ).transform( tri.vertices[2] );
 
 				rasterizer.drawTriangle( vec1, vec2, vec3, true );
 
@@ -172,6 +176,8 @@ int main( string[] args )
 										 ( viewport * ( projection * ( view * model2 ) ) ).transform( vec2 ),
 										 ( viewport * ( projection * ( view * model2) ) ).transform( vec3 ), true );*/
 			}
+
+			w.unlockSurface();
 			w.update();
 		}
 

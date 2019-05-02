@@ -35,6 +35,7 @@ public:
 		// Create new window at the center of the screen
 		window = SDL_CreateWindow( title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags );
 		renderer = SDL_CreateRenderer( window, -1, SDL_RendererFlags.SDL_RENDERER_SOFTWARE );
+		surface = SDL_GetWindowSurface(window);
 
 		if ( !window )
 		{
@@ -51,7 +52,6 @@ public:
 	void quit()
 	{
 		SDL_FreeSurface( surface );
-		SDL_DestroyTexture( tex );
 		SDL_DestroyRenderer( renderer );
 		SDL_DestroyWindow( window );
 		SDL_Quit();
@@ -59,18 +59,6 @@ public:
 
 	void update()
 	{
-		// Free up memory from the last frame
-		SDL_DestroyTexture( tex );
-		SDL_FreeSurface( surface );
-		SDL_RenderClear( renderer );
-
-		// Create the next frame
-		surface = SDL_CreateRGBSurfaceFrom( cast( void* )rasterizer.getFrameBuffer(), width, height, 32, width * 4, rmask, gmask, bmask, amask );
-		tex = SDL_CreateTextureFromSurface( renderer, surface );
-
-		SDL_RenderCopy( renderer, tex, null, null );
-		SDL_RenderPresent( renderer );
-
 		SDL_UpdateWindowSurface( window );
 
 		deltaTime = SDL_GetTicks() - startTime;
@@ -78,14 +66,25 @@ public:
 		SDL_SetWindowTitle( window, toStringz( format( "%s%d", "FPS: ", 1000 / deltaTime ) ) );
 	}
 
+	void lockSurface() 
+	{
+		SDL_FillRect( surface, null, 0 );
+		SDL_LockSurface( surface );
+	}
+
+	void unlockSurface()
+	{
+		SDL_UnlockSurface( surface );
+	}
+
 	Rasterizer getRasterizer() { return rasterizer; }
 	SDL_Window *getWindow() { return window; }
+	SDL_Surface *getSurface() { return surface; }
 
 private:
-	SDL_Texture *tex = null;
 	SDL_Renderer *renderer = null;
 	SDL_Window *window = null;
-	SDL_Surface *surface = null;
+	SDL_Surface* surface;
 	Rasterizer rasterizer;
 	int height = 640;
 	int width = 480;
