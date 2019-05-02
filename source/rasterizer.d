@@ -87,7 +87,7 @@ public:
 		//float nearW = nearH * ( cast( float )WIDTH / HEIGHT ), farW = farH * ( cast( float )WIDTH / HEIGHT );
 
 		// Draw triangle
-		//if ( isWithinFrustum( vec1) && isWithinFrustum( vec2 ) && isWithinFrustum( vec3 ) )
+		if ( isWithinFrustum( vec1) && isWithinFrustum( vec2 ) && isWithinFrustum( vec3 ) )
 		{
 			if ( bWireframe )
 			{
@@ -171,10 +171,10 @@ private:
 		}
 	}
 
-	// Culling
+	// Check is this vector is within the frustum (our viewing area)
 	bool isWithinFrustum( Vec4f vec )
 	{
-		if ( vec.x <= vec.w && vec.y <= vec.w && vec.z <= vec.w )
+		if ( abs( vec.x ) <= abs( vec.w ) && abs( vec.y ) <= abs( vec.w ) && abs( vec.z ) <= abs( vec.w ) )
 		{
 			return true;
 		}

@@ -330,14 +330,15 @@ Matrix_4x4 viewportTransform( float halfWidth, float halfHeight )
 // Perspective matrix
 // FOV = field of view in radians
 // zNear/zFar = mappings for z from 0 to 1
+// zRange = how deep our frustum goes
 Matrix_4x4 perspective( float FOV, float aspectRatio, float zNear, float zFar )
 {
 	float invScale = tan( FOV / 2 );
-	float zRange = zNear - zFar;
+	float inv_zRange = 1 / ( zNear - zFar );
 
-	float[][] m = [[1 / ( invScale * aspectRatio ), 0.0f, 0.0f, 0.0f],
+	float[][] m = [[1.0f / ( invScale * aspectRatio ), 0.0f, 0.0f, 0.0f],
 				   [0.0f, 1.0f / invScale, 0.0f, 0.0f],
-				   [0.0f, 0.0f, ( -zNear - zFar ) / zRange, ( 2 * zFar * zNear ) / zRange],
+				   [0.0f, 0.0f, ( -zNear - zFar ) * inv_zRange, ( 2 * zFar * zNear ) * inv_zRange],
 				   [0.0f, 0.0f, 1.0f, 0.0f]];
 
 	return new Matrix_4x4( m );

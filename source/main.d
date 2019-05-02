@@ -10,7 +10,7 @@ import input;
 import derelict.sdl2.sdl;
 import std.stdio;
 
-// Window dimensions (fixed for the time being)
+// NOTE: Z-axis is reversed so the depth is really 0-(-255)
 enum WIDTH = 1200;
 enum HEIGHT = 800;
 enum DEPTH = 255;
@@ -44,42 +44,42 @@ int main( string[] args )
 
 		// C U B E
 		triangle[12] list;
-		list[0].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.5f );
-		list[0].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.5f );
-		list[0].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.5f );
-		list[1].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.5f );
-		list[1].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.5f );
-		list[1].vertices[2] = new Vec4f( 0.4f, -0.2f, 0.5f );
-		list[2].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.5f );
-		list[2].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.5f );
-		list[2].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.9f );
-		list[3].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.5f );
-		list[3].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.9f );
-		list[3].vertices[2] = new Vec4f( 0.4f, -0.2f, 0.9f );
-		list[4].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
-		list[4].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.9f );
-		list[4].vertices[2] = new Vec4f( -0.2f, 0.4f, 0.9f );
-		list[5].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
-		list[5].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.9f );
-		list[5].vertices[2] = new Vec4f( -0.2f, -0.2f, 0.9f );
-		list[6].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.9f );
-		list[6].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.9f );
-		list[6].vertices[2] = new Vec4f( -0.2f, 0.4f, 0.5f );
-		list[7].vertices[0] = new Vec4f( -0.2f, -0.2f, 0.9f );
-		list[7].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.5f );
-		list[7].vertices[2] = new Vec4f( -0.2f, -0.2f, 0.5f );
-		list[8].vertices[0] = new Vec4f( -0.2f, 0.4f, 0.5f );
-		list[8].vertices[1] = new Vec4f( -0.2f, 0.4f, 0.9f );
-		list[8].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.9f );
-		list[9].vertices[0] = new Vec4f( -0.2f, 0.4f, 0.5f );
-		list[9].vertices[1] = new Vec4f( 0.4f, 0.4f, 0.9f );
-		list[9].vertices[2] = new Vec4f( 0.4f, 0.4f, 0.5f );
-		list[10].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
-		list[10].vertices[1] = new Vec4f( -0.2f, -0.2f, 0.9f );
-		list[10].vertices[2] = new Vec4f( -0.2f, -0.2f, 0.5f );
-		list[11].vertices[0] = new Vec4f( 0.4f, -0.2f, 0.9f );
-		list[11].vertices[1] = new Vec4f( -0.2f, -0.2f, 0.5f );
-		list[11].vertices[2] = new Vec4f( 0.4f, -0.2f, 0.5f );
+		list[0].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.5f );
+		list[0].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.5f );
+		list[0].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.5f );
+		list[1].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.5f );
+		list[1].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.5f );
+		list[1].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.5f );
+		list[2].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.5f );
+		list[2].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.5f );
+		list[2].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.9f );
+		list[3].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.5f );
+		list[3].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.9f );
+		list[3].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.9f );
+		list[4].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
+		list[4].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.9f );
+		list[4].vertices[2] = new Vec4f( -0.2f, 0.4f, -0.9f );
+		list[5].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
+		list[5].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.9f );
+		list[5].vertices[2] = new Vec4f( -0.2f, -0.2f, -0.9f );
+		list[6].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.9f );
+		list[6].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.9f );
+		list[6].vertices[2] = new Vec4f( -0.2f, 0.4f, -0.5f );
+		list[7].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.9f );
+		list[7].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.5f );
+		list[7].vertices[2] = new Vec4f( -0.2f, -0.2f, -0.5f );
+		list[8].vertices[0] = new Vec4f( -0.2f, 0.4f, -0.5f );
+		list[8].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.9f );
+		list[8].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.9f );
+		list[9].vertices[0] = new Vec4f( -0.2f, 0.4f, -0.5f );
+		list[9].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.9f );
+		list[9].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.5f );
+		list[10].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
+		list[10].vertices[1] = new Vec4f( -0.2f, -0.2f, -0.9f );
+		list[10].vertices[2] = new Vec4f( -0.2f, -0.2f, -0.5f );
+		list[11].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
+		list[11].vertices[1] = new Vec4f( -0.2f, -0.2f, -0.5f );
+		list[11].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.5f );
 
 		// Camera
 		Vec4f eye = new Vec4f( 0.0f, 0.0f, 0.0f );
@@ -127,16 +127,16 @@ int main( string[] args )
 			Vec4f fwd = look * speed;
 			Vec4f right = fwd.crossProduct( up ).normalized() * speed;
 
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_a ) ) ) { eye = eye + right; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_d ) ) ) { eye = eye - right; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_w ) ) ) { eye = eye + fwd; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_s ) ) ) { eye = eye - fwd; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_a ) ) ) { eye = eye - right; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_d ) ) ) { eye = eye + right; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_w ) ) ) { eye = eye - fwd; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_s ) ) ) { eye = eye + fwd; }
 
 			// up, down, left, right camera translations
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_UP ) ) )    { eye.y -= speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_DOWN ) ) )  { eye.y += speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_LEFT ) ) )  { eye.x -= speed; }
-			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_RIGHT ) ) ) { eye.x += speed; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_UP ) ) )    { eye.y += speed; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_DOWN ) ) )  { eye.y -= speed; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_LEFT ) ) )  { eye.x += speed; }
+			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_RIGHT ) ) ) { eye.x -= speed; }
 
 			// Close the program on escape
 			if ( handler.isPressed( SDL_GetScancodeFromKey( SDLK_ESCAPE ) ) ) { bRunning = false; }
@@ -151,8 +151,8 @@ int main( string[] args )
 			Matrix_4x4 view = lookAt( eye, target, up );
 
 			// Model matrix
-			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, 0.5f ) );
-			Matrix_4x4 t2 = initTranslation( new Vec4f( 1.0, 0.0f, 2.0f ) );
+			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, -3.0f ) );
+			Matrix_4x4 t2 = initTranslation( new Vec4f( 1.0, 0.0f, -2.0f ) );
 			//Matrix_4x4 r = initRotate( degreesToRadians( deg * 30 ), degreesToRadians( deg * 30 ), degreesToRadians( deg * 30 ) );
 			Matrix_4x4 r = identity();
 			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f ) );
