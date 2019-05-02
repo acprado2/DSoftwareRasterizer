@@ -10,6 +10,7 @@ import input;
 import mesh;
 import derelict.sdl2.sdl;
 import std.stdio;
+import std.string;
 
 // NOTE: Z-axis is reversed so the depth is really 0-(-255)
 enum WIDTH = 1200;
@@ -17,7 +18,7 @@ enum HEIGHT = 800;
 enum DEPTH = 255;
 enum FOV = 70.0f;
 enum SENSITIVITY = 0.25f;
-enum MOVEMENT_SPEED = 2.0f;
+enum MOVEMENT_SPEED = 12.0f;
 
 int main( string[] args )
 {
@@ -27,6 +28,9 @@ int main( string[] args )
 
 	if ( w.create() )
 	{
+		printf( "Enter mesh to load:\n" );
+		string mesh_name = strip( readln() );
+
 		SDL_SetRelativeMouseMode( SDL_TRUE );
 		SDL_ShowCursor( SDL_DISABLE );
 
@@ -47,7 +51,7 @@ int main( string[] args )
 		float pitch = 0.0f;
 		float yaw = 0.0f;
 
-		Mesh mesh = new Mesh( "teapot.obj" );
+		Mesh mesh = new Mesh( mesh_name );
 
 		// Camera
 		Vec4f eye = new Vec4f( 0.0f, 0.0f, 0.0f );
@@ -116,7 +120,7 @@ int main( string[] args )
 			Matrix_4x4 view = lookAt( eye, target, up );
 
 			// Model matrix
-			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, -1.0f, -10.0f ) );
+			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, -50.0f ) );
 			//Matrix_4x4 r = initRotate( 0.0f, 0.0f, 0.0f );
 			Matrix_4x4 r = identity();
 			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f ) );
