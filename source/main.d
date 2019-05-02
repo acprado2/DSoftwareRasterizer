@@ -10,7 +10,6 @@ import input;
 import mesh;
 import derelict.sdl2.sdl;
 import std.stdio;
-import std.parallelism : parallel;
 
 // NOTE: Z-axis is reversed so the depth is really 0-(-255)
 enum WIDTH = 1200;
@@ -48,46 +47,7 @@ int main( string[] args )
 		float pitch = 0.0f;
 		float yaw = 0.0f;
 
-		// C U B E
-		triangle[12] list;
-		list[0].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.5f );
-		list[0].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.5f );
-		list[0].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.5f );
-		list[1].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.5f );
-		list[1].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.5f );
-		list[1].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.5f );
-		list[2].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.5f );
-		list[2].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.5f );
-		list[2].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.9f );
-		list[3].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.5f );
-		list[3].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.9f );
-		list[3].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.9f );
-		list[4].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
-		list[4].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.9f );
-		list[4].vertices[2] = new Vec4f( -0.2f, 0.4f, -0.9f );
-		list[5].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
-		list[5].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.9f );
-		list[5].vertices[2] = new Vec4f( -0.2f, -0.2f, -0.9f );
-		list[6].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.9f );
-		list[6].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.9f );
-		list[6].vertices[2] = new Vec4f( -0.2f, 0.4f, -0.5f );
-		list[7].vertices[0] = new Vec4f( -0.2f, -0.2f, -0.9f );
-		list[7].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.5f );
-		list[7].vertices[2] = new Vec4f( -0.2f, -0.2f, -0.5f );
-		list[8].vertices[0] = new Vec4f( -0.2f, 0.4f, -0.5f );
-		list[8].vertices[1] = new Vec4f( -0.2f, 0.4f, -0.9f );
-		list[8].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.9f );
-		list[9].vertices[0] = new Vec4f( -0.2f, 0.4f, -0.5f );
-		list[9].vertices[1] = new Vec4f( 0.4f, 0.4f, -0.9f );
-		list[9].vertices[2] = new Vec4f( 0.4f, 0.4f, -0.5f );
-		list[10].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
-		list[10].vertices[1] = new Vec4f( -0.2f, -0.2f, -0.9f );
-		list[10].vertices[2] = new Vec4f( -0.2f, -0.2f, -0.5f );
-		list[11].vertices[0] = new Vec4f( 0.4f, -0.2f, -0.9f );
-		list[11].vertices[1] = new Vec4f( -0.2f, -0.2f, -0.5f );
-		list[11].vertices[2] = new Vec4f( 0.4f, -0.2f, -0.5f );
-
-		Mesh mesh = new Mesh( "2fort.obj" );
+		Mesh mesh = new Mesh( "teapot.obj" );
 
 		// Camera
 		Vec4f eye = new Vec4f( 0.0f, 0.0f, 0.0f );
@@ -170,7 +130,8 @@ int main( string[] args )
 				Vec4f vec2 = ( projection * ( view * model ) ).transform( tri.vertices[1] );
 				Vec4f vec3 = ( projection * ( view * model ) ).transform( tri.vertices[2] );
 
-				rasterizer.drawTriangle( vec1, vec2, vec3, true );
+				rasterizer.drawTriangle( vec1, vec2, vec3 );
+				//rasterizer.drawTriangle( vec1, vec2, vec3, true );
 
 				/*rasterizer.drawTriangle( ( viewport * ( projection * ( view * model2 ) ) ).transform( vec1 ),
 										 ( viewport * ( projection * ( view * model2 ) ) ).transform( vec2 ),
@@ -179,6 +140,7 @@ int main( string[] args )
 
 			w.unlockSurface();
 			w.update();
+			rasterizer.clearZBuffer();
 		}
 
 		w.quit();

@@ -11,6 +11,7 @@ import vector;
 import matrix;
 import std.math;
 import std.algorithm.mutation;
+import std.random;
 
 class Rasterizer: Bitmap
 {
@@ -18,6 +19,10 @@ public:
 	this( int width, int height )
 	{
 		super( width, height );
+
+		// z-buffer for depth checking
+		z_buffer = new float[width * height];
+		z_buffer[0 .. z_buffer.length] = float.infinity;
 	}
 
 	// draw a line given two vectors
@@ -27,6 +32,9 @@ public:
 		int x2 = cast( int )ceil( vec2.x );
 		int y1 = cast( int )ceil( vec1.y );
 		int y2 = cast( int )ceil( vec2.y );
+		float z1 = vec1.z;
+		float z2 = vec2.z;
+
 		int dx = abs( x2 - x1 );
 		int dy = abs( y2 - y1 );
 		bool bSwapAxes = false;
@@ -44,6 +52,7 @@ public:
 		{
 			swap( x1, x2 );
 			swap( y1, y2 );
+			swap( z1, z2 );
 		}
 
 		dx = x2 - x1;
@@ -53,11 +62,25 @@ public:
 		int y = y1;
 		Color def = Color( cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF );
 
-		for ( int x = x1; x <= x2; ++x )
-		{
-			// If we swapped axes earlier correct on draw
-			bSwapAxes ? draw( y, x, def ) : draw( x, y, def );
+		// icky floating point math
+		float step = ( ( 1.0f / z1 ) - ( 1.0f / z2 ) ) / dy;
+		float z = z1;
 
+		for ( int x = x1; x < x2; ++x )
+		{
+			int idx = bSwapAxes ? y + x * getWidth() : x + y * getWidth();
+			// Check if z is closer to the screen than the current buffered z
+			float idx_z = z_buffer[idx];
+			if ( z > z_buffer[idx] )
+			{
+				// Update z-buffer
+				z_buffer[idx] = z;
+
+				// If we swapped axes earlier correct on draw
+				bSwapAxes ? draw( y, x, def ) : draw( x, y, def );
+			}
+
+			z += step;
 			error += derror;
 			if ( error > dx )
 			{
@@ -68,11 +91,20 @@ public:
 	}
 
 	// draw a horizontal line between two x-coordinates given a y-pos
-	void drawLineHorizontal( int x1, int x2, int ypos )
+	void drawLineHorizontal( int x1, int x2, int ypos, float z1, float z2 )
 	{
+		float zStep = ( z2 - z1 ) / ( x2 - x1 );
+		float z = z1;
+
 		for ( int x = x1; x < x2; ++x )
 		{
-				draw( x, ypos, Color( cast (byte)0xFF, cast (byte)0x00, cast (byte)0x00, cast (byte)0xFF ) );
+			int idx = x + ypos * getWidth();
+			if ( z > z_buffer[idx] )
+			{
+				z_buffer[idx] = z;
+				draw( x, ypos, Color( cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF ) );
+			}
+			z += zStep;
 		}
 	}
 
@@ -101,6 +133,11 @@ public:
 						  viewport.transform( vec3 ).perspectiveDivide() );
 			}
 		}
+	}
+
+	void clearZBuffer()
+	{
+		z_buffer[0 .. z_buffer.length ] = 0.0f;
 	}
 
 private:
@@ -146,27 +183,53 @@ private:
 		// In order to draw this triangle using horizontal lines we will cut the triangle into two triangles
 		// at the horizontal line that intersects vec2 and the line between vec3 and vec1
 
-		// left and right side based on handedness
-		float[] left  = bHandedness ? interpolate( vec1.x, vec1.y, vec2.x, vec2.y ) : interpolate( vec1.x, vec1.y, vec3.x, vec3.y );
-		float[] right = bHandedness ? interpolate( vec1.x, vec1.y, vec3.x, vec3.y ) : interpolate( vec1.x, vec1.y, vec2.x, vec2.y );
+		float[] left, right, z_left, z_right;
+		// Use handedness to determine our linear interpolation arrays
+		if ( bHandedness )
+		{
+			left  = interpolate( vec1.x, vec1.y, vec2.x, vec2.y );
+			right = interpolate( vec1.x, vec1.y, vec3.x, vec3.y );
+			z_left = interpolate( 1.0f / vec1.z, vec1.y, 1.0f / vec3.z, vec3.y);
+			z_right = interpolate( 1.0f / vec1.z, vec1.y, 1.0f / vec3.z, vec3.y);
+		}
+		else
+		{
+			left  = interpolate( vec1.x, vec1.y, vec3.x, vec3.y );
+			right = interpolate( vec1.x, vec1.y, vec2.x, vec2.y );
+			z_left = interpolate( 1.0f / vec1.z, vec1.y, 1.0f / vec3.z, vec3.y);
+			z_right = interpolate( 1.0f / vec1.z, vec1.y, 1.0f / vec2.z, vec2.y);
+		}
+
 		int count = -1;
 
 		// Iterate through top triangle and draw scanlines
-		foreach( i; 0 .. cast( int )ceil( vec2.y - vec1.y ) )
+		for( int i = 0; i < cast( int )ceil( vec2.y - vec1.y ); ++i )
 		{
-			drawLineHorizontal( cast( int )ceil( left[i] ), cast( int )ceil( right[i] ), cast( int )ceil( vec1.y + i ) );
+			drawLineHorizontal( cast( int )ceil( left[i] ), cast( int )ceil( right[i] ), cast( int )ceil( vec1.y + i ), z_left[i], z_right[i] );
 
 			// Track step position so we can draw the bottom triangle later
 			++count;
 		}
 
 		// switch out the left or right depending on the handedness
-		bHandedness ? ( left = interpolate( vec2.x, vec2.y, vec3.x, vec3.y ) ) : ( right = interpolate( vec2.x, vec2.y, vec3.x, vec3.y ) );
+		if ( bHandedness )
+		{
+			left = interpolate( vec2.x, vec2.y, vec3.x, vec3.y );
+			z_left = interpolate( 1.0f / vec2.z, vec2.y, 1.0f / vec3.z, vec3.y ); // Interpolate over 1/z (over z isn't linear)
+		}
+		else
+		{
+			right = interpolate( vec2.x, vec2.y, vec3.x, vec3.y );
+			z_right = interpolate( 1.0f / vec2.z, vec2.y, 1.0f / vec3.z, vec3.y ); // Interpolate over 1/z (over z isn't linear)
+		}
+
+		// if we didn't loop earlier make sure we don't access illegal memory
+		if ( count == -1 ) { ++count; }
 
 		// Iterate through bottom triangle and draw scanlines
-		foreach( i; 0 .. cast( int )ceil( vec3.y - vec2.y ) )
+		for( int i = 0; i < cast( int )ceil( vec3.y - vec2.y ); ++i )
 		{
-			drawLineHorizontal( cast( int )ceil( left[bHandedness ? i : count + i] ), cast( int )ceil( right[bHandedness ? count + i : i] ), cast( int )ceil( vec2.y + i ) );
+			drawLineHorizontal( cast( int )ceil( left[bHandedness ? i : count + i] ), cast( int )ceil( right[bHandedness ? count + i : i] ), cast( int )ceil( vec2.y + i ), z_left[i], z_right[i] );
 		}
 	}
 
@@ -180,6 +243,8 @@ private:
 
 		return false;
 	}
+
+	float[] z_buffer;
 }
 
 // generate a list of coordinates interpolated along a line
