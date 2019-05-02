@@ -51,7 +51,7 @@ public:
 		int derror = 2 * dy;
 		int error = 0;
 		int y = y1;
-		Color def = Color( cast (byte)0x00, cast (byte)0x00, cast (byte)0x00, cast (byte)0x00 );
+		Color def = Color( cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF, cast (byte)0xFF );
 
 		for ( int x = x1; x <= x2; ++x )
 		{
@@ -72,27 +72,24 @@ public:
 	{
 		for ( int x = x1; x < x2; ++x )
 		{
-			draw( x, ypos, Color( cast (byte)0xFF, cast (byte)0x00, cast (byte)0x00, cast (byte)0xFF ) );
+				draw( x, ypos, Color( cast (byte)0xFF, cast (byte)0x00, cast (byte)0x00, cast (byte)0xFF ) );
 		}
 	}
 
 	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, bool bWireframe = false )
 	{
-		// Map our triangle to screen space
-		Matrix_4x4 viewport = viewportTransform( getWidth() / 2.0f, getHeight() / 2.0f );
-
 		// Draw triangle
 		if ( bWireframe )
 		{
-			wireframeTriangle( viewport.transform( vec1 ).perspectiveDivide(),
-					  viewport.transform( vec2 ).perspectiveDivide(),
-					  viewport.transform( vec3 ).perspectiveDivide() );
+			wireframeTriangle( vec1.perspectiveDivide(),
+							   vec2.perspectiveDivide(),
+							   vec3.perspectiveDivide() );
 		}
 		else
 		{
-			triangle( viewport.transform( vec1 ).perspectiveDivide(),
-					  viewport.transform( vec2 ).perspectiveDivide(),
-					  viewport.transform( vec3 ).perspectiveDivide() );
+			triangle( vec1.perspectiveDivide(),
+					  vec2.perspectiveDivide(),
+					  vec3.perspectiveDivide() );
 		}
 	}
 
@@ -113,6 +110,15 @@ private:
 	// Helper method for drawTriangle
 	void triangle( Vec4f vec1, Vec4f vec2, Vec4f vec3 )
 	{
+		// Dumb check for dumb triangles
+		if ( ( vec1.x == vec2.x && vec1.y == vec2.y ) ||
+			 ( vec1.x == vec3.x && vec1.y == vec3.y ) ||
+			 ( vec2.x == vec3.x && vec2.y == vec3.y ) )
+		{
+			// This isn't a triangle
+			return;
+		}
+
 		// Sort vectors by y-pos (lowest to highest)
 		if ( vec1.y > vec2.y ) { swap( vec1, vec2 ); }
 		if ( vec2.y > vec3.y ) { swap( vec2, vec3 ); }

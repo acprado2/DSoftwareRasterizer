@@ -83,69 +83,43 @@ public:
 		return null;
 	}
 
-	// Scale
-	Matrix_4x4 scale( Vec4f vec )
-	{
-		float[][] m = [[vec.x, 0.0f, 0.0f, 0.0f], [0.0f, vec.x, 0.0f, 0.0f], [0.0f, 0.0f, vec.z, 0.0f], [0.0f, 0.0f, 0.0f, 1.0f]];
-		Matrix_4x4 matrix = new Matrix_4x4( m );
-		return this * matrix;
-	}
-
 	// Rotate about the x-axis
 	Matrix_4x4 rotateX( float angle )
 	{
-		float sinf = sin( angle );
-		float cosf = cos( angle );
-
-		float[][] m = [[1.0f, 0.0f, 0.0f, 0.0f], [0.0f, cosf, -sinf, 0.0f], [0.0f, sinf, cosf, 0.0f], [0.0f, 0.0f, 0.0f, 1.0f]];
-		Matrix_4x4 matrix = new Matrix_4x4( m );
+		Matrix_4x4 matrix = initRotateX( angle );
 		return this * matrix;
 	}
 
 	// Rotate about the y-axis
 	Matrix_4x4 rotateY( float angle )
 	{
-		float sinf = sin( angle );
-		float cosf = cos( angle );
-
-		float[][] m = [[cosf, 0.0f, sinf, 0.0f], [0.0f, 1.0f, 0.0f, 0.0f], [-sinf, 0.0f, cosf, 0.0f], [0.0f, 0.0f, 0.0f, 1.0f]];
-		Matrix_4x4 matrix = new Matrix_4x4( m );
+		Matrix_4x4 matrix = initRotateY( angle );
 		return this * matrix;
 	}
 
 	// Rotate about the z-axis
 	Matrix_4x4 rotateZ( float angle )
 	{
-		float sinf = sin( angle );
-		float cosf = cos( angle );
-
-		float[][] m = [[cosf, -sinf, 0.0f, 0.0f], [sinf, cosf, 0.0f, 0.0f], [0.0f, 0.0f, 0.0f, 1.0f],  [0.0f, 0.0f, 0.0f, 1.0f]];
-		Matrix_4x4 matrix = new Matrix_4x4( m );
+		Matrix_4x4 matrix = initRotateZ( angle );
 		return this * matrix;
 	}
 
 	// Rotate about an arbitrary axis defined as a vector
 	Matrix_4x4 rotate( Vec4f axis, float angle )
 	{
-		float sinf = sin( angle );
-		float cosf = cos( angle );
-
-		float[][] m = [[( axis.x * axis.x ) * ( 1.0f - cosf ) + cosf, ( axis.x * axis.y ) * ( 1 - cosf ) - ( axis.z * sinf ), ( axis.x * axis.z ) * ( 1.0f - cosf ) + ( axis.y * sinf ), 0.0f],
-					   [( axis.x * axis.y ) * ( 1.0f - cosf ) + ( axis.z * sinf ), ( axis.y * axis.y ) * ( 1.0f - cosf ) + cosf, ( axis.y * axis.z ) * ( 1.0f - cosf ) - ( axis.x * sinf ), 0.0f],
-		[( axis.x * axis.z ) * ( 1.0f - cosf ) - ( axis.y * sinf ), ( axis.y * axis.z ) * ( 1.0f - cosf ) + ( axis.x * sinf ), ( axis.z * axis.z ) * ( 1.0f - cosf ) + cosf, 0.0f],
-		[0.0f, 0.0f, 0.0f, 1.0f]];
-		Matrix_4x4 matrix = new Matrix_4x4( m );
-		return this * matrix;
+		return this * initRotate( axis, angle );
 	}
 
+	// Scale
+	Matrix_4x4 scale( Vec4f vec )
+	{
+		return this * initScale( vec );
+	}
+
+	// Translation
 	Matrix_4x4 translate( Vec4f vec )
 	{
-		Matrix_4x4 matrix = identity();
-		matrix[3, 0] = vec.x;
-		matrix[3, 1] = vec.y;
-		matrix[3, 2] = vec.z;
-
-		return this * matrix;
+		return this * initTranslation( vec );
 	}
 
 	// Transform a vector using this matrix
@@ -177,11 +151,10 @@ public:
 			{
 				for ( size_t j = 0; j < other.numCols(); ++j )
 				{
-					result[i, j] = 0.0f;
-					for ( size_t k = 0; k < this.numCols(); ++k )
-					{
-						result[i, j] = result[i, j] + ( m[i][k] * other[k, j] );
-					}
+					result[i, j] = m[i][0] * other[0, j] + 
+								   m[i][1] * other[1, j] +
+								   m[i][2] * other[2, j] + 
+								   m[i][3] * other[3, j];
 				}
 			}
 		}
@@ -214,30 +187,142 @@ pragma( inline ) float degreesToRadians( float d )
 	return d * ( PI / 180 );
 }
 
-// Matrix of our screen space
-pragma( inline ) Matrix_4x4 viewportTransform( float halfWidth, float halfHeight )
+// Identity matrix
+pragma( inline ) Matrix_4x4 identity()
 {
-	float[][] m = [[halfWidth, 0.0f, 0.0f, halfWidth], 
-				   [0.0f, -halfHeight, 0.0f, halfHeight], 
-				   [0.0f, 0.0f, 0.5f, 0.5f], 
+	float[][] m = [[1, 0, 0, 0],
+				   [0, 1, 0, 0],
+				   [0, 0, 1, 0],
+				   [0, 0, 0, 1]];
+
+	return new Matrix_4x4( m );
+}
+
+// Create a lookat matrix for camera manipulation
+/*pragma( inline ) Matrix_4x4 lookAt( Vec4f eye, Vec4f center, Vec4f up )
+{
+	Vec4f l_forward = ( eye - center ).normalized();
+	Vec4f l_right = up.crossProduct( l_forward ).normalized();
+	Vec4f l_up = l_forward.crossProduct( l_right );
+
+	// Magic fast matrix inversion that only works with translation and rotation matrices
+	float[][] m = [[l_right.x, l_up.x, l_forward.x, 0.0f],
+				   [l_right.y, l_up.y, l_forward.y, 0.0f],
+				   [l_right.z, l_up.z, l_forward.z, 0.0f],
+				   [-l_right.dotProduct( eye ), -l_up.dotProduct( eye ), -l_forward.dotProduct( eye ), 1.0f]];
+
+	return new Matrix_4x4( m );
+}*/
+
+// Create a lookat matrix for camera manipulation
+pragma( inline ) Matrix_4x4 lookAt( Vec4f eye, Vec4f center, Vec4f up )
+{
+	Vec4f l_forward = ( center - eye ).normalized();
+	Vec4f l_right = l_forward.crossProduct( up ).normalized();
+	Vec4f l_up = l_right.crossProduct( l_forward );
+
+	// Matrix magic
+	float[][] m = [[l_right.x, l_right.y, l_right.z, -eye.x],
+				   [l_up.x, l_up.y, l_up.z, -eye.y],
+				   [-l_forward.x, -l_forward.y, -l_forward.z, -eye.z],
 				   [0.0f, 0.0f, 0.0f, 1.0f]];
 
 	return new Matrix_4x4( m );
 }
 
-// Identity matrix
-pragma( inline ) Matrix_4x4 identity()
+// Rotate about the x-axis
+pragma( inline ) Matrix_4x4 initRotateX( float angle )
 {
-	Matrix_4x4 iden = new Matrix_4x4();
-	for ( size_t i = 0; i < iden.numRows(); ++i )
-	{
-		for ( size_t j = 0; j < iden.numCols(); ++j )
-		{
-			iden[i, j] = ( i == j ) ? 1.0f : 0.0f;
-		}
-	}
+	float sinf = sin( angle );
+	float cosf = cos( angle );
 
-	return iden;
+	float[][] m = [[1.0f, 0.0f, 0.0f, 0.0f], 
+				   [0.0f, cosf, -sinf, 0.0f], 
+				   [0.0f, sinf, cosf, 0.0f], 
+				   [0.0f, 0.0f, 0.0f, 1.0f]];
+
+	return new Matrix_4x4( m );
+}
+
+// Rotate about the y-axis
+pragma( inline ) Matrix_4x4 initRotateY( float angle )
+{
+	float sinf = sin( angle );
+	float cosf = cos( angle );
+
+	float[][] m = [[cosf, 0.0f, -sinf, 0.0f], 
+				   [0.0f, 1.0f, 0.0f, 0.0f], 
+				   [sinf, 0.0f, cosf, 0.0f], 
+				   [0.0f, 0.0f, 0.0f, 1.0f]];
+
+	return new Matrix_4x4( m );
+}
+
+// Rotate about the z-axis
+pragma( inline ) Matrix_4x4 initRotateZ( float angle )
+{
+	float sinf = sin( angle );
+	float cosf = cos( angle );
+
+	float[][] m = [[cosf, -sinf, 0.0f, 0.0f], 
+				   [sinf, cosf, 0.0f, 0.0f], 
+				   [0.0f, 0.0f, 0.0f, 1.0f],  
+				   [0.0f, 0.0f, 0.0f, 1.0f]];
+
+	return new Matrix_4x4( m );
+}
+
+// Rotate about an arbitrary axis defined as a vector
+pragma( inline ) Matrix_4x4 initRotate( Vec4f axis, float angle )
+{
+	float sinf = sin( angle );
+	float cosf = cos( angle );
+
+	float[][] m = [[( axis.x * axis.x ) * ( 1.0f - cosf ) + cosf, ( axis.x * axis.y ) * ( 1 - cosf ) - ( axis.z * sinf ), ( axis.x * axis.z ) * ( 1.0f - cosf ) + ( axis.y * sinf ), 0.0f],
+				   [( axis.x * axis.y ) * ( 1.0f - cosf ) + ( axis.z * sinf ), ( axis.y * axis.y ) * ( 1.0f - cosf ) + cosf, ( axis.y * axis.z ) * ( 1.0f - cosf ) - ( axis.x * sinf ), 0.0f],
+				   [( axis.x * axis.z ) * ( 1.0f - cosf ) - ( axis.y * sinf ), ( axis.y * axis.z ) * ( 1.0f - cosf ) + ( axis.x * sinf ), ( axis.z * axis.z ) * ( 1.0f - cosf ) + cosf, 0.0f],
+				   [0.0f, 0.0f, 0.0f, 1.0f]];
+
+	return new Matrix_4x4( m );
+}
+
+// Initialize rotations on all three base axes and multiply them in the proper order
+pragma( inline ) Matrix_4x4 initRotate( float angle_x, float angle_y, float angle_z )
+{
+	return initRotateZ( angle_z ) * ( initRotateY( angle_y ) * initRotateX( angle_x ) );
+}
+
+// Scale
+pragma( inline ) Matrix_4x4 initScale( Vec4f vec )
+{
+	float[][] m = [[vec.x, 0.0f, 0.0f, 0.0f], 
+				   [0.0f, vec.x, 0.0f, 0.0f], 
+				   [0.0f, 0.0f, vec.z, 0.0f], 
+				   [0.0f, 0.0f, 0.0f, 1.0f]];
+
+	return new Matrix_4x4( m );
+}
+
+// Translate
+pragma( inline ) Matrix_4x4 initTranslation( Vec4f vec )
+{
+	Matrix_4x4 matrix = identity();
+	matrix[0, 3] = vec.x;
+	matrix[1, 3] = vec.y;
+	matrix[2, 3] = vec.z;
+
+	return matrix;
+}
+
+// Matrix of our screen space
+Matrix_4x4 viewportTransform( float halfWidth, float halfHeight )
+{
+	float[][] m = [[halfWidth, 0.0f, 0.0f, halfWidth], 
+				   [0.0f, -halfHeight, 0.0f, halfHeight], 
+				   [0.0f, 0.0f, 1.0f, 0.0f], 
+				   [0.0f, 0.0f, 0.0f, 1.0f]];
+
+	return new Matrix_4x4( m );
 }
 
 // Perspective matrix
@@ -252,5 +337,6 @@ Matrix_4x4 perspective( float FOV, float aspectRatio, float zNear, float zFar )
 				   [0.0f, 1.0f / invScale, 0.0f, 0.0f],
 				   [0.0f, 0.0f, (-zNear -zFar) / zRange, ( 2 * zFar * zNear ) / zRange],
 				   [0.0f, 0.0f, 1.0f, 0.0f]];
+
 	return new Matrix_4x4( m );
 }

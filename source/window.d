@@ -79,6 +79,7 @@ public:
 	}
 
 	Rasterizer getRasterizer() { return rasterizer; }
+	SDL_Window *getWindow() { return window; }
 
 private:
 	SDL_Texture *tex = null;

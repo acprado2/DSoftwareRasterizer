@@ -157,4 +157,10 @@ public:
 	{
 		return mixin( "new Vector4D( this.x "~op~" vec.x, this.y "~op~" vec.y, this.z "~op~" vec.z, this.w "~op~" vec.w )" );
 	}
+
+	
+	Vector4D opBinary( string op )( float val )
+	{
+		return mixin( "new Vector4D( this.x "~op~" val, this.y "~op~" val, this.z "~op~" val, this.w "~op~" val )" );
+	}
 }
