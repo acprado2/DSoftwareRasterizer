@@ -22,15 +22,15 @@ enum MOVEMENT_SPEED = 12.0f;
 
 int main( string[] args )
 {
+	printf( "Enter mesh to load:\n" );
+	string mesh_name = strip( readln() );
+
 	DerelictSDL2.load();
 
 	Window w = new Window( "Software Rendering Demo", HEIGHT, WIDTH, SDL_WindowFlags.SDL_WINDOW_SHOWN );
 
 	if ( w.create() )
 	{
-		printf( "Enter mesh to load:\n" );
-		string mesh_name = strip( readln() );
-
 		SDL_SetRelativeMouseMode( SDL_TRUE );
 		SDL_ShowCursor( SDL_DISABLE );
 
@@ -121,7 +121,7 @@ int main( string[] args )
 
 			// Model matrix
 			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, -50.0f ) );
-			//Matrix_4x4 r = initRotate( 0.0f, 0.0f, 0.0f );
+			//Matrix_4x4 r = initRotate( 0.0f, degreesToRadians( 90.0f ), 0.0f );
 			Matrix_4x4 r = identity();
 			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f ) );
 			Matrix_4x4 model = t * r * s;
