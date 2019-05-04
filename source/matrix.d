@@ -258,7 +258,7 @@ pragma( inline ) Matrix_4x4 initRotateZ( float angle )
 
 	float[][] m = [[cosf, -sinf, 0.0f, 0.0f], 
 				   [sinf, cosf, 0.0f, 0.0f], 
-				   [0.0f, 0.0f, 0.0f, 1.0f],  
+				   [0.0f, 0.0f, 1.0f, 0.0f],  
 				   [0.0f, 0.0f, 0.0f, 1.0f]];
 
 	return new Matrix_4x4( m );
