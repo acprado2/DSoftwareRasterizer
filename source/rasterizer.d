@@ -109,10 +109,8 @@ public:
 		}
 	}
 
-	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, bool bWireframe = false, Color c = COLOR_WHITE )
+	void drawTriangle( Vec4f vec1, Vec4f vec2, Vec4f vec3, Matrix_4x4 viewport, bool bWireframe = false, Color c = COLOR_WHITE )
 	{
-		// Map our triangle to screen space
-		Matrix_4x4 viewport = viewportTransform( getWidth() / 2.0f, getHeight() / 2.0f );
 
 		// CULLING
 		//float nearH = 2 * tan( FOV / 2 ) * 0.1, farH = 2 * tan( FOV / 2 ) * DEPTH;

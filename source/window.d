@@ -6,7 +6,6 @@
 
 module window;
 
-import rasterizer;
 import derelict.sdl2.sdl;
 import std.stdio;
 import std.string;
@@ -43,8 +42,6 @@ public:
 			return false;
 		}
 
-		rasterizer = new Rasterizer( width, height );
-
 		return true;
 	}
 
@@ -77,7 +74,6 @@ public:
 		SDL_UnlockSurface( surface );
 	}
 
-	Rasterizer getRasterizer() { return rasterizer; }
 	SDL_Window *getWindow() { return window; }
 	SDL_Surface *getSurface() { return surface; }
 
@@ -85,7 +81,6 @@ private:
 	SDL_Renderer *renderer = null;
 	SDL_Window *window = null;
 	SDL_Surface* surface;
-	Rasterizer rasterizer;
 	int height = 640;
 	int width = 480;
 	const char *title = "Window";
