@@ -110,6 +110,12 @@ public:
 		return this * initRotate( axis, angle );
 	}
 
+	// Rotate on all three base axes and multiply them in the proper order
+	Matrix_4x4 rotate( float angle_x, float angle_y, float angle_z )
+	{
+		return this * initRotate( angle_x, angle_y, angle_z );
+	}
+
 	// Scale
 	Matrix_4x4 scale( Vec4f vec )
 	{
@@ -199,22 +205,6 @@ pragma( inline ) Matrix_4x4 identity()
 }
 
 // Create a lookat matrix for camera manipulation
-/*pragma( inline ) Matrix_4x4 lookAt( Vec4f eye, Vec4f center, Vec4f up )
-{
-	Vec4f l_forward = ( eye - center ).normalized();
-	Vec4f l_right = up.crossProduct( l_forward ).normalized();
-	Vec4f l_up = l_forward.crossProduct( l_right );
-
-	// Magic fast matrix inversion that only works with translation and rotation matrices
-	float[][] m = [[l_right.x, l_up.x, l_forward.x, 0.0f],
-				   [l_right.y, l_up.y, l_forward.y, 0.0f],
-				   [l_right.z, l_up.z, l_forward.z, 0.0f],
-				   [-l_right.dotProduct( eye ), -l_up.dotProduct( eye ), -l_forward.dotProduct( eye ), 1.0f]];
-
-	return new Matrix_4x4( m );
-}*/
-
-// Create a lookat matrix for camera manipulation
 pragma( inline ) Matrix_4x4 lookAt( Vec4f eye, Vec4f center, Vec4f up )
 {
 	Vec4f l_forward = ( center - eye ).normalized();
@@ -298,7 +288,7 @@ pragma( inline ) Matrix_4x4 initRotate( float angle_x, float angle_y, float angl
 pragma( inline ) Matrix_4x4 initScale( Vec4f vec )
 {
 	float[][] m = [[vec.x, 0.0f, 0.0f, 0.0f], 
-				   [0.0f, vec.x, 0.0f, 0.0f], 
+				   [0.0f, vec.y, 0.0f, 0.0f], 
 				   [0.0f, 0.0f, vec.z, 0.0f], 
 				   [0.0f, 0.0f, 0.0f, 1.0f]];
 
