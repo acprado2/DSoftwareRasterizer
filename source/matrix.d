@@ -137,6 +137,16 @@ public:
 						  m[3][0] * vec.x + m[3][1] * vec.y + m[3][2] * vec.z + m[3][3] * vec.w );
 	}
 
+	// Transform a vector and feed results into an existing vector
+	// to save on allocating to the heap
+	void transformFast( Vec4f vecIn, Vec4f vecOut )
+	{
+		vecOut.initialize( m[0][0] * vecIn.x + m[0][1] * vecIn.y + m[0][2] * vecIn.z + m[0][3] * vecIn.w,
+					 m[1][0] * vecIn.x + m[1][1] * vecIn.y + m[1][2] * vecIn.z + m[1][3] * vecIn.w,
+					 m[2][0] * vecIn.x + m[2][1] * vecIn.y + m[2][2] * vecIn.z + m[2][3] * vecIn.w,
+					 m[3][0] * vecIn.x + m[3][1] * vecIn.y + m[3][2] * vecIn.z + m[3][3] * vecIn.w );
+	}
+
 	// Operator overloading
 	float opIndex( size_t i, size_t j ) { return m[i][j]; }
 	float opIndexAssign( float value, size_t i, size_t j ) 

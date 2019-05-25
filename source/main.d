@@ -16,9 +16,9 @@ import std.string;
 enum WIDTH = 1200;
 enum HEIGHT = 800;
 enum DEPTH = 255;
-enum FOV = 70.0f;
+enum FOV = 100.0f;
 enum SENSITIVITY = 0.25f;
-enum MOVEMENT_SPEED = 12.0f;
+enum MOVEMENT_SPEED = 40.0f;
 
 int main( string[] args )
 {
@@ -127,29 +127,47 @@ int main( string[] args )
 			Matrix_4x4 view = lookAt( eye, target, up );
 
 			// Model matrix
-			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, -250.0f ) );
-			//Matrix_4x4 r = initRotate( 0.0f, degreesToRadians( 90.0f ), 0.0f );
-			Matrix_4x4 r = identity();
-			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f ) );
-			Matrix_4x4 model = t * r * s;
+			Matrix_4x4 t = initTranslation( new Vec4f( 0.0f, 0.0f, -150.0f) );
+			Matrix_4x4 r = initRotate( 0.0f, 0.0f, 0.0f );
+			Matrix_4x4 s = initScale( new Vec4f( 1.0f, 1.0f, 1.0f, ) );
+			Matrix_4x4 model = t * ( r * s );
 
 			// Create our pvm matrix
-			Matrix_4x4 pvm = projection * ( view * model );
+			Matrix_4x4 pvm = projection * view * model;
+
+			// Initialize all of our work vectors once so we don't allocate/deallocate 100000 times a frame
+			Vec4f vec1 = new Vec4f( 0.0f, 0.0f, 0.0f );
+			Vec4f vec2 = new Vec4f( 0.0f, 0.0f, 0.0f );
+			Vec4f vec3 = new Vec4f( 0.0f, 0.0f, 0.0f );
+			Vec4f vec3vec1 = new Vec4f( 0.0f, 0.0f, 0.0f );
+			Vec4f vec2vec1 = new Vec4f( 0.0f, 0.0f, 0.0f );
+			Vec4f vecmodeltransform = new Vec4f( 0.0f, 0.0f, 0.0f );
 
 			w.lockSurface();
 			foreach ( tri; mesh.triangles )
 			{
-				Vec4f vec1 = pvm.transform( tri.vertices[0] );
-				Vec4f vec2 = pvm.transform( tri.vertices[1] );
-				Vec4f vec3 = pvm.transform( tri.vertices[2] );
+				pvm.transformFast( tri.vertices[0], vec1 );
+				pvm.transformFast( tri.vertices[1], vec2 );
+				pvm.transformFast( tri.vertices[2], vec3 );
+
+				// Copy vec3 and vec2 for normal calculations
+				vec3vec1.initialize( vec3 );
+				vec2vec1.initialize( vec2 );
 
 				// Normal to the surface
-				Vec4f normal = ( vec3 - vec1 ).crossProduct( vec2 - vec1 );
-				normal.normalizeInPlace();
+				vec3vec1.sub( vec1 );
+				vec2vec1.sub( vec1 );
+				vec3vec1.crossProductInPlace( vec2vec1 );
+				vec3vec1.normalizeInPlace();
 
-				if ( normal.dotProduct( model.transform( tri.vertices[0] ) - look ) < 0.0f )
+				// Transform to look
+				model.transformFast( tri.vertices[0], vecmodeltransform );
+				vecmodeltransform.sub( look );
+
+				// Don't draw if there's no light on this triangle
+				if ( vec3vec1.dotProduct( vecmodeltransform ) < 0.0f )
 				{
-					float intensity = normal.dotProduct( light_dir );
+					float intensity = vec3vec1.dotProduct( light_dir );
 
 					rasterizer.drawTriangle( vec1, vec2, vec3, viewport, false, Color( cast( ubyte )( intensity * 0xFF ), cast( ubyte )( intensity * 0xFF ), cast( ubyte )( intensity * 0xFF ), cast( ubyte )( 0xFF ) ) );
 				}

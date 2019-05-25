@@ -110,26 +110,48 @@ public:
 	// Constructors and destructors
 	this( float x, float y, float z, float w = 1.0f ) 
 	{
+		initialize( x, y, z, w );
+	}
+
+	~this() {}
+
+	void initialize( float x, float y, float z, float w = 1.0f )
+	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.w = w;
 	}
 
-	~this() {}
+	void initialize( Vector4D vec )
+	{
+		this.x = vec.x;
+		this.y = vec.y;
+		this.z = vec.z;
+		this.w = vec.w;
+	}
 
 	// Arithmetic methods
-	Vector4D add( Vector4D vec ) { return new Vector4D( this.x + vec.x, this.y + vec.y, this.z + vec.z, this.w + vec.w ); }
-	Vector4D subtract( Vector4D vec ) { return new Vector4D( this.x - vec.x, this.y - vec.y, this.z - vec.z, this.w + vec.w ); }
+	void sub( Vector4D vec ) { this.initialize( this.x - vec.x, this.y - vec.y, this.z - vec.z, this.w - vec.w ); }
 
 	float dotProduct( Vector4D vec ) { return ( this.x * vec.x + this.y * vec.y + this.z * vec.z + this.w * vec.w ); }
+
 	Vector4D crossProduct( Vector4D vec ) 
 	{ 
 		float x, y, z;
 		x = this.y * vec.z - this.z * vec.y;
 		y = this.z * vec.x - this.x * vec.z;
 		z = this.x * vec.y - this.y * vec.x;
-		return new Vector4D( x, y, z, 0 );
+		return new Vector4D( x, y, z, 0.0f );
+	}
+
+	void crossProductInPlace( Vector4D vec ) 
+	{ 
+		float x, y, z;
+		x = this.y * vec.z - this.z * vec.y;
+		y = this.z * vec.x - this.x * vec.z;
+		z = this.x * vec.y - this.y * vec.x;
+		this.initialize( x, y, z, 0.0f );
 	}
 
 	Vector4D perspectiveDivide() { return new Vector4D( x / w, y / w, z / w, w ); }

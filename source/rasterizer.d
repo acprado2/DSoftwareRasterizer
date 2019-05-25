@@ -24,7 +24,7 @@ public:
 
 		// z-buffer for depth checking
 		z_buffer = new float[width * height];
-		z_buffer[0 .. z_buffer.length] = float.infinity;
+		z_buffer[0 .. z_buffer.length] = 0.0f;
 	}
 
 	// draw a line given two vectors
